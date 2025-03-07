@@ -3,8 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
 
+interface Budget {
+  id: string;
+  year: number;
+  createdAt: Date;
+  updatedAt: Date;
+  amount: number;
+  userId: string;
+}
+
 // Get all budget entries for the current user
-export const GET: Handler = async (req) => {
+export const GET: Handler<Budget[]> = async (req) => {
   try {
     const { userId } = await auth();
 
@@ -41,7 +50,7 @@ export const GET: Handler = async (req) => {
 };
 
 // Create a new budget entry
-export const POST: Handler = async (req) => {
+export const POST: Handler<Budget> = async (req) => {
   try {
     const { userId } = await auth();
 

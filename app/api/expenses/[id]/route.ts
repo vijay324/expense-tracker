@@ -3,8 +3,19 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
 
+interface Expense {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  amount: number;
+  category: string;
+  description: string | null;
+  date: Date;
+  userId: string;
+}
+
 // Get a specific expense entry
-export const GET: Handler = async (req, { params }) => {
+export const GET: Handler<Expense> = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -14,7 +25,7 @@ export const GET: Handler = async (req, { params }) => {
 
     // Ensure params is resolved
     const resolvedParams = await params;
-    const id = resolvedParams.id;
+    const id = resolvedParams.id as string;
 
     if (!id) {
       return new NextResponse("Expense ID is required", { status: 400 });
@@ -51,7 +62,7 @@ export const GET: Handler = async (req, { params }) => {
 };
 
 // Update a specific expense entry
-export const PATCH: Handler = async (req, { params }) => {
+export const PATCH: Handler<Expense> = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -61,7 +72,7 @@ export const PATCH: Handler = async (req, { params }) => {
 
     // Ensure params is resolved
     const resolvedParams = await params;
-    const id = resolvedParams.id;
+    const id = resolvedParams.id as string;
 
     if (!id) {
       return new NextResponse("Expense ID is required", { status: 400 });
@@ -113,7 +124,7 @@ export const DELETE: Handler = async (req, { params }) => {
 
     // Ensure params is resolved
     const resolvedParams = await params;
-    const id = resolvedParams.id;
+    const id = resolvedParams.id as string;
 
     if (!id) {
       return new NextResponse("Expense ID is required", { status: 400 });

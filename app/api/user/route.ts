@@ -1,8 +1,18 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import type { Handler } from "typed-route-handler";
 
-export async function GET(req: NextRequest) {
+interface User {
+  id: string;
+  clerkId: string;
+  email: string;
+  name: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const GET: Handler<User> = async (req) => {
   try {
     const { userId } = await auth();
 
@@ -43,9 +53,9 @@ export async function GET(req: NextRequest) {
     console.error("[USER_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
 
-export async function POST(req: NextRequest) {
+export const POST: Handler<User> = async (req) => {
   try {
     const { userId } = await auth();
 
@@ -80,4 +90,4 @@ export async function POST(req: NextRequest) {
     console.error("[USER_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
