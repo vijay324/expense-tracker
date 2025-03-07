@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
 interface Transaction {
@@ -13,7 +13,7 @@ interface Transaction {
 }
 
 // Get dashboard statistics for the current user
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
 

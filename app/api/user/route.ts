@@ -1,8 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
 
@@ -45,7 +45,7 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
 

@@ -1,11 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
 // Get a specific income entry
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { userId } = await auth();
@@ -14,7 +14,9 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.id) {
+    const { id } = context.params;
+
+    if (!id) {
       return new NextResponse("Income ID is required", { status: 400 });
     }
 
@@ -32,7 +34,7 @@ export async function GET(
     // Get the income entry
     const income = await prisma.income.findUnique({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
     });
@@ -50,8 +52,8 @@ export async function GET(
 
 // Update a specific income entry
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { userId } = await auth();
@@ -60,7 +62,9 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.id) {
+    const { id } = context.params;
+
+    if (!id) {
       return new NextResponse("Income ID is required", { status: 400 });
     }
 
@@ -81,7 +85,7 @@ export async function PATCH(
     // Update the income entry
     const income = await prisma.income.update({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
       data: {
@@ -101,8 +105,8 @@ export async function PATCH(
 
 // Delete a specific income entry
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { userId } = await auth();
@@ -111,7 +115,9 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.id) {
+    const { id } = context.params;
+
+    if (!id) {
       return new NextResponse("Income ID is required", { status: 400 });
     }
 
@@ -129,7 +135,7 @@ export async function DELETE(
     // Delete the income entry
     await prisma.income.delete({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
     });

@@ -1,9 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
 // Get all expense entries for the current user
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
 
@@ -40,7 +40,7 @@ export async function GET() {
 }
 
 // Create a new expense entry
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
 

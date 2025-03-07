@@ -1,12 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import type { Handler } from "typed-route-handler";
 
 // Get a specific expense entry
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export const GET: Handler = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -14,7 +12,11 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.id) {
+    // Ensure params is resolved
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
+    if (!id) {
       return new NextResponse("Expense ID is required", { status: 400 });
     }
 
@@ -32,7 +34,7 @@ export async function GET(
     // Get the expense entry
     const expense = await prisma.expense.findUnique({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
     });
@@ -46,13 +48,10 @@ export async function GET(
     console.error("[EXPENSE_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
 
 // Update a specific expense entry
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export const PATCH: Handler = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -60,7 +59,11 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.id) {
+    // Ensure params is resolved
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
+    if (!id) {
       return new NextResponse("Expense ID is required", { status: 400 });
     }
 
@@ -81,7 +84,7 @@ export async function PATCH(
     // Update the expense entry
     const expense = await prisma.expense.update({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
       data: {
@@ -97,13 +100,10 @@ export async function PATCH(
     console.error("[EXPENSE_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
 
 // Delete a specific expense entry
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export const DELETE: Handler = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -111,7 +111,11 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.id) {
+    // Ensure params is resolved
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
+    if (!id) {
       return new NextResponse("Expense ID is required", { status: 400 });
     }
 
@@ -129,7 +133,7 @@ export async function DELETE(
     // Delete the expense entry
     await prisma.expense.delete({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
     });
@@ -139,4 +143,4 @@ export async function DELETE(
     console.error("[EXPENSE_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
