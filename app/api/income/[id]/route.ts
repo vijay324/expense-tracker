@@ -1,12 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import type { Handler } from "typed-route-handler";
 
 // Get a specific income entry
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export const GET: Handler = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -14,7 +12,9 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = context.params;
+    // Ensure params is resolved
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     if (!id) {
       return new NextResponse("Income ID is required", { status: 400 });
@@ -48,13 +48,10 @@ export async function GET(
     console.error("[INCOME_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
 
 // Update a specific income entry
-export async function PATCH(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export const PATCH: Handler = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -62,7 +59,9 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = context.params;
+    // Ensure params is resolved
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     if (!id) {
       return new NextResponse("Income ID is required", { status: 400 });
@@ -101,13 +100,10 @@ export async function PATCH(
     console.error("[INCOME_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
 
 // Delete a specific income entry
-export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export const DELETE: Handler = async (req, { params }) => {
   try {
     const { userId } = await auth();
 
@@ -115,7 +111,9 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id } = context.params;
+    // Ensure params is resolved
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     if (!id) {
       return new NextResponse("Income ID is required", { status: 400 });
@@ -145,4 +143,4 @@ export async function DELETE(
     console.error("[INCOME_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-}
+};
