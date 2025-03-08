@@ -131,7 +131,6 @@ export function IncomeTable({
       <DataTable
         data={incomes}
         columns={columns}
-        itemsPerPage={5}
         onEdit={handleEdit}
         onDelete={(income) => {
           setIncomeToDelete(income);

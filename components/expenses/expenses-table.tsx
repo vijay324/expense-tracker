@@ -130,7 +130,6 @@ export function ExpensesTable({
       <DataTable
         data={expenses}
         columns={columns}
-        itemsPerPage={5}
         onEdit={handleEdit}
         onDelete={(expense) => {
           setExpenseToDelete(expense);
