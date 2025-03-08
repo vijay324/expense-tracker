@@ -6,8 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IncomeForm } from "@/components/income/income-form";
 import { IncomeTable } from "@/components/income/income-table";
+import { IncomeCategories } from "@/components/income/income-categories";
+import { IncomeDialog } from "@/components/income/income-dialog";
 import prisma from "@/lib/db";
 
 async function getIncomes() {
@@ -54,16 +55,22 @@ export default async function IncomePage() {
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Income
         </h2>
+        <IncomeDialog
+          buttonVariant="default"
+          buttonSize="default"
+          showIcon={true}
+          className="ml-4"
+        />
       </div>
 
-      {/* Add Income Form Card */}
+      {/* Income Categories */}
       <Card className="overflow-hidden">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xl">Add Income</CardTitle>
-          <CardDescription>Add a new income entry</CardDescription>
+          <CardTitle className="text-xl">Income Categories</CardTitle>
+          <CardDescription>Summary of your income by category</CardDescription>
         </CardHeader>
         <CardContent>
-          <IncomeForm />
+          <IncomeCategories incomes={incomes} />
         </CardContent>
       </Card>
 

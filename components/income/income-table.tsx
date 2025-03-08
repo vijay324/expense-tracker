@@ -27,7 +27,12 @@ export function IncomeTable({
   incomes: initialIncomes,
   onEdit,
 }: IncomeTableProps) {
-  const [incomes, setIncomes] = useState<Income[]>(initialIncomes);
+  // Sort initial incomes by date (most recent first)
+  const sortedInitialIncomes = [...initialIncomes].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  const [incomes, setIncomes] = useState<Income[]>(sortedInitialIncomes);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [incomeToDelete, setIncomeToDelete] = useState<Income | null>(null);
@@ -43,7 +48,11 @@ export function IncomeTable({
         throw new Error("Failed to fetch income entries");
       }
       const data = await response.json();
-      setIncomes(data);
+      // Sort fetched data by date (most recent first)
+      const sortedData = [...data].sort((a, b) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+      setIncomes(sortedData);
     } catch (error) {
       console.error("Error fetching income:", error);
     }
@@ -93,7 +102,7 @@ export function IncomeTable({
 
   const columns = [
     {
-      header: "Date",
+      header: "Date ↓",
       accessorKey: "date" as keyof Income,
       cell: (income: Income) => format(new Date(income.date), "MMM dd, yyyy"),
     },

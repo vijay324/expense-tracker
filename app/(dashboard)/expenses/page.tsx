@@ -6,8 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ExpenseForm } from "@/components/expenses/expense-form";
 import { ExpensesTable } from "@/components/expenses/expenses-table";
+import { ExpenseCategories } from "@/components/expenses/expense-categories";
+import { ExpenseDialog } from "@/components/expenses/expense-dialog";
 import prisma from "@/lib/db";
 
 async function getExpenses() {
@@ -54,16 +55,24 @@ export default async function ExpensesPage() {
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Expenses
         </h2>
+        <ExpenseDialog
+          buttonVariant="default"
+          buttonSize="default"
+          showIcon={true}
+          className="ml-4"
+        />
       </div>
 
-      {/* Add Expense Form Card */}
+      {/* Expense Categories */}
       <Card className="overflow-hidden">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xl">Add Expense</CardTitle>
-          <CardDescription>Add a new expense entry</CardDescription>
+          <CardTitle className="text-xl">Expense Categories</CardTitle>
+          <CardDescription>
+            Summary of your expenses by category
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <ExpenseForm />
+          <ExpenseCategories expenses={expenses} />
         </CardContent>
       </Card>
 

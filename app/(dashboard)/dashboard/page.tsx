@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Overview } from "@/components/dashboard/overview";
 import { RecentTransactions } from "@/components/dashboard/transactions";
+import { QuickActions } from "@/components/dashboard/quick-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
@@ -74,6 +75,12 @@ export default function DashboardPage() {
             Dashboard
           </h2>
         </div>
+
+        {/* Quick Actions - still show even when loading */}
+        <div className="mb-6">
+          <QuickActions />
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
@@ -145,6 +152,11 @@ export default function DashboardPage() {
             })}
           </span>
         </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-6">
+        <QuickActions />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

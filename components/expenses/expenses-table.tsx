@@ -27,7 +27,12 @@ export function ExpensesTable({
   expenses: initialExpenses,
   onEdit,
 }: ExpensesTableProps) {
-  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
+  // Sort initial expenses by date (most recent first)
+  const sortedInitialExpenses = [...initialExpenses].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  const [expenses, setExpenses] = useState<Expense[]>(sortedInitialExpenses);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
@@ -43,7 +48,11 @@ export function ExpensesTable({
         throw new Error("Failed to fetch expenses");
       }
       const data = await response.json();
-      setExpenses(data);
+      // Sort fetched data by date (most recent first)
+      const sortedData = [...data].sort((a, b) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+      setExpenses(sortedData);
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
@@ -93,7 +102,7 @@ export function ExpensesTable({
 
   const columns = [
     {
-      header: "Date",
+      header: "Date ↓",
       accessorKey: "date" as keyof Expense,
       cell: (expense: Expense) =>
         format(new Date(expense.date), "MMM dd, yyyy"),
