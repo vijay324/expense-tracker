@@ -2,19 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  TrendingUp,
-  TrendingDown,
-  PiggyBank,
-  LogOut,
-  User,
-  Settings,
-} from "lucide-react";
+import { Home, DollarSign, CreditCard, PiggyBank, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SignOutButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface SidebarProps {
   closeMobileSidebar?: () => void;
@@ -23,25 +13,25 @@ interface SidebarProps {
 const routes = [
   {
     label: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/dashboard",
+    icon: <Home className="h-5 w-5" />,
+    href: "/",
     color: "text-sky-500",
   },
   {
     label: "Income",
-    icon: TrendingUp,
+    icon: <DollarSign className="h-5 w-5" />,
     href: "/income",
     color: "text-emerald-500",
   },
   {
     label: "Expenses",
-    icon: TrendingDown,
+    icon: <CreditCard className="h-5 w-5" />,
     href: "/expenses",
-    color: "text-rose-500",
+    color: "text-violet-500",
   },
   {
     label: "Budget",
-    icon: PiggyBank,
+    icon: <PiggyBank className="h-5 w-5" />,
     href: "/budget",
     color: "text-violet-500",
   },
@@ -49,7 +39,6 @@ const routes = [
 
 export function Sidebar({ closeMobileSidebar }: SidebarProps) {
   const pathname = usePathname();
-  const { user } = useUser();
 
   const handleLinkClick = () => {
     if (closeMobileSidebar) {
@@ -58,73 +47,64 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-800 shadow-lg">
-      {/* User profile section */}
-      <div className="px-6 py-6 border-b border-gray-200 dark:border-gray-700">
-        <Link
-          href="/dashboard"
-          className="flex items-center mb-6"
-          onClick={handleLinkClick}
-        >
-          <div className="w-8 h-8 mr-2 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">ET</span>
-          </div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Expense<span className="text-primary">Tracker</span>
-          </h1>
-        </Link>
+    <div className="h-full flex flex-col bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm border-r border-gray-200/50 dark:border-gray-800/50 shadow-sm">
+      {/* Mobile close button */}
+      {closeMobileSidebar && (
+        <div className="absolute top-4 right-4 lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={closeMobileSidebar}
+            className="rounded-full h-8 w-8 bg-white/90 dark:bg-gray-800/90 shadow-sm hover:shadow-md transition-all"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
-        <div className="flex items-center mt-4">
-          <Avatar className="h-10 w-10 mr-3">
-            <AvatarImage src={user?.imageUrl} />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {user?.firstName?.charAt(0) || user?.username?.charAt(0) || "U"}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {user?.fullName || user?.username || "User"}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {user?.primaryEmailAddress?.emailAddress || ""}
-            </p>
+      {/* Logo */}
+      <div className="px-6 py-8">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-md">
+            <span className="text-white font-bold text-xl">ET</span>
           </div>
+          <span className="ml-3 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 truncate">
+            <span className="hidden sm:inline">Expense</span>
+            <span className="sm:hidden">E</span>
+            <span className="text-primary">Tracker</span>
+          </span>
         </div>
       </div>
 
-      {/* Navigation links */}
-      <div className="flex-1 px-3 py-4 overflow-y-auto">
-        <div className="space-y-1">
+      {/* Navigation */}
+      <div className="flex-1 px-4 py-6">
+        <div className="space-y-2">
           {routes.map((route) => (
             <Link
               key={route.href}
               href={route.href}
               onClick={handleLinkClick}
               className={cn(
-                "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                "flex items-center gap-x-3 text-sm font-medium px-4 py-3 rounded-xl transition-all",
                 pathname === route.href
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-primary/10 text-primary shadow-sm"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 hover:shadow-sm"
               )}
             >
-              <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
-              {route.label}
+              <div
+                className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-lg",
+                  pathname === route.href
+                    ? "bg-primary/10"
+                    : "bg-gray-100 dark:bg-gray-800"
+                )}
+              >
+                <div className={cn("shrink-0", route.color)}>{route.icon}</div>
+              </div>
+              <span>{route.label}</span>
             </Link>
           ))}
         </div>
-      </div>
-
-      {/* Footer with sign out button */}
-      <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-700">
-        <SignOutButton>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-          >
-            <LogOut className="h-5 w-5 mr-3 text-gray-500" />
-            Sign Out
-          </Button>
-        </SignOutButton>
       </div>
     </div>
   );

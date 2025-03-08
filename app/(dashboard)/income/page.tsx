@@ -49,15 +49,17 @@ export default async function IncomePage() {
   const incomes = await getIncomes();
 
   return (
-    <div className="flex-1 space-y-6">
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Income</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          Income
+        </h2>
       </div>
 
       {/* Add Income Form Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Add Income</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Add Income</CardTitle>
           <CardDescription>Add a new income entry</CardDescription>
         </CardHeader>
         <CardContent>
@@ -66,9 +68,9 @@ export default async function IncomePage() {
       </Card>
 
       {/* Income List Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Income List</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Income List</CardTitle>
           <CardDescription>View and manage your income entries</CardDescription>
         </CardHeader>
         <CardContent>

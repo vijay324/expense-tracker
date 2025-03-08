@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "./table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -53,15 +53,19 @@ export function DataTable<T extends { id: string }>({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-md border">
+    <div className="space-y-4 w-full overflow-x-auto">
+      <div className="rounded-md border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
-                <TableHead key={column.header}>{column.header}</TableHead>
+                <TableHead key={column.header} className="whitespace-nowrap">
+                  {column.header}
+                </TableHead>
               ))}
-              {(onEdit || onDelete) && <TableHead>Actions</TableHead>}
+              {(onEdit || onDelete) && (
+                <TableHead className="whitespace-nowrap">Actions</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -78,15 +82,18 @@ export function DataTable<T extends { id: string }>({
               currentData.map((item) => (
                 <TableRow key={item.id}>
                   {columns.map((column) => (
-                    <TableCell key={`${item.id}-${String(column.accessorKey)}`}>
+                    <TableCell
+                      key={`${item.id}-${String(column.accessorKey)}`}
+                      className="whitespace-nowrap"
+                    >
                       {column.cell
                         ? column.cell(item)
                         : String(item[column.accessorKey] || "")}
                     </TableCell>
                   ))}
                   {(onEdit || onDelete) && (
-                    <TableCell>
-                      <div className="flex space-x-2">
+                    <TableCell className="whitespace-nowrap">
+                      <div className="flex flex-wrap gap-2">
                         {onEdit && (
                           <Button
                             variant="outline"
@@ -118,12 +125,12 @@ export function DataTable<T extends { id: string }>({
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-gray-500 order-2 sm:order-1">
             Showing {startIndex + 1} to {Math.min(endIndex, data.length)} of{" "}
             {data.length} entries
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 order-1 sm:order-2">
             <Button
               variant="outline"
               size="sm"

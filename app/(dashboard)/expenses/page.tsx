@@ -49,15 +49,17 @@ export default async function ExpensesPage() {
   const expenses = await getExpenses();
 
   return (
-    <div className="flex-1 space-y-6">
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Expenses</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          Expenses
+        </h2>
       </div>
 
       {/* Add Expense Form Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Add Expense</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Add Expense</CardTitle>
           <CardDescription>Add a new expense entry</CardDescription>
         </CardHeader>
         <CardContent>
@@ -66,9 +68,9 @@ export default async function ExpensesPage() {
       </Card>
 
       {/* Expense List Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Expense List</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Expense List</CardTitle>
           <CardDescription>
             View and manage your expense entries
           </CardDescription>

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Navbar } from "@/components/layout/navbar";
-import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeProvider } from "next-themes";
+import { Navbar } from "@/components/layout/navbar";
+import { Sidebar } from "@/components/layout/sidebar";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
   children,
@@ -13,11 +13,21 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Close sidebar when clicking outside on mobile
+  // Handle responsive behavior
   useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    // Initial check
+    checkIsMobile();
+
+    // Handle resize
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      checkIsMobile();
+      if (window.innerWidth >= 1024) {
         setIsSidebarOpen(false);
       }
     };
@@ -26,51 +36,38 @@ export default function DashboardLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <div className="h-full relative bg-gray-50 dark:bg-gray-900">
-        {/* Mobile sidebar toggle */}
-        <div className="md:hidden fixed top-4 left-4 z-50">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="rounded-full bg-white shadow-md border-gray-200 dark:bg-gray-800 dark:border-gray-700"
-          >
-            {isSidebarOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
-
-        {/* Mobile sidebar overlay */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Navbar */}
-        <Navbar />
-
         {/* Sidebar */}
         <div
-          className={`
-            fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
-            md:translate-x-0 md:static md:z-0 md:w-72 md:flex md:flex-col
-            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          `}
+          className={cn(
+            "fixed inset-y-0 left-0 z-40 lg:z-0 w-72 lg:w-64 xl:w-72 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static",
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          )}
         >
           <Sidebar closeMobileSidebar={() => setIsSidebarOpen(false)} />
         </div>
 
+        {/* Overlay */}
+        {isSidebarOpen && isMobile && (
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* Main content */}
-        <main className="min-h-screen md:pl-72 pt-16 transition-all duration-300 ease-in-out">
-          <div className="h-full p-4 md:p-6">{children}</div>
-        </main>
+        <div className="lg:pl-64 xl:pl-72 min-h-screen flex flex-col">
+          <Navbar toggleSidebar={toggleSidebar} isMobile={isMobile} />
+          <main className="flex-1 pt-16 px-4 md:px-6 lg:px-8 pb-8">
+            <div className="max-w-7xl mx-auto pt-6">{children}</div>
+          </main>
+        </div>
       </div>
     </ThemeProvider>
   );

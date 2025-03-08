@@ -50,15 +50,17 @@ export default async function BudgetPage() {
   const budgets = await getBudgets();
 
   return (
-    <div className="flex-1 space-y-6">
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Budget Planning</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          Budget Planning
+        </h2>
       </div>
 
       {/* Set Annual Budget Form Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Set Annual Budget</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Set Annual Budget</CardTitle>
           <CardDescription>Set your budget for the year</CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,9 +69,9 @@ export default async function BudgetPage() {
       </Card>
 
       {/* Budget Progress Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Budget Progress</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Budget Progress</CardTitle>
           <CardDescription>
             Track your spending against your annual budget
           </CardDescription>
@@ -80,9 +82,9 @@ export default async function BudgetPage() {
       </Card>
 
       {/* All Budgets Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Budgets</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">All Budgets</CardTitle>
           <CardDescription>
             View and manage all your budget entries
           </CardDescription>

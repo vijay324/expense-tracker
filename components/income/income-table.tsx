@@ -100,11 +100,20 @@ export function IncomeTable({
     {
       header: "Category",
       accessorKey: "category" as keyof Income,
+      cell: (income: Income) => (
+        <span className="inline-block max-w-[150px] truncate">
+          {income.category}
+        </span>
+      ),
     },
     {
       header: "Description",
       accessorKey: "description" as keyof Income,
-      cell: (income: Income) => income.description || "-",
+      cell: (income: Income) => (
+        <span className="inline-block max-w-[200px] truncate">
+          {income.description || "-"}
+        </span>
+      ),
     },
     {
       header: "Amount",

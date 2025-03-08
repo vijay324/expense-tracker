@@ -101,11 +101,20 @@ export function ExpensesTable({
     {
       header: "Category",
       accessorKey: "category" as keyof Expense,
+      cell: (expense: Expense) => (
+        <span className="inline-block max-w-[150px] truncate">
+          {expense.category}
+        </span>
+      ),
     },
     {
       header: "Description",
       accessorKey: "description" as keyof Expense,
-      cell: (expense: Expense) => expense.description || "-",
+      cell: (expense: Expense) => (
+        <span className="inline-block max-w-[200px] truncate">
+          {expense.description || "-"}
+        </span>
+      ),
     },
     {
       header: "Amount",

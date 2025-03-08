@@ -1,59 +1,88 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import { UserButton } from "@clerk/nextjs";
-import { Moon, Sun } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
 
-export const Navbar = () => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+interface NavbarProps {
+  toggleSidebar: () => void;
+  isMobile: boolean;
+}
 
-  // Avoid hydration mismatch by only rendering theme toggle after mount
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
+  const pathname = usePathname();
+  const { user } = useUser();
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+  // Get page title from pathname
+  const getPageTitle = () => {
+    const path = pathname.split("/")[1];
+    if (!path) return "Dashboard";
+    return path.charAt(0).toUpperCase() + path.slice(1);
   };
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 md:px-6 h-16 flex items-center justify-end md:justify-end md:left-72">
-      <div className="flex items-center gap-4">
-        {/* Theme toggle button */}
-        {mounted && (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            className="rounded-full h-9 w-9 border-gray-200 dark:border-gray-700"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
-        )}
+    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-4 lg:px-6">
+      <div className="h-full flex items-center justify-between">
+        {/* Left section - Page Title (visible on desktop) */}
+        <div className="flex items-center">
+          <div className="hidden lg:flex items-center">
+            <h1 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+              {getPageTitle()}
+            </h1>
+          </div>
 
-        {/* User avatar/button */}
-        <div className="h-9 w-9">
+          {/* Mobile brand */}
+          <div className="flex lg:hidden items-center">
+            <div className="w-8 h-8 mr-2 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-sm">
+              <span className="text-white font-bold text-lg">ET</span>
+            </div>
+            <h1 className="text-lg font-bold">
+              <span className="hidden xs:inline bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+                Expense
+              </span>
+              <span className="xs:hidden bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+                E
+              </span>
+              <span className="text-primary">Tracker</span>
+            </h1>
+          </div>
+        </div>
+
+        {/* Right section - Actions */}
+        <div className="flex items-center space-x-3">
+          {/* Mobile menu toggle - only visible on mobile */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="h-9 w-9 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 shadow-sm"
+            >
+              <Menu className="h-4 w-4" />
+            </Button>
+          )}
+
+          {/* Theme toggle */}
+          <div className="p-1.5 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 shadow-sm">
+            <ModeToggle />
+          </div>
+
+          {/* User button */}
           <UserButton
-            afterSignOutUrl="/sign-in"
+            afterSignOutUrl="/"
             appearance={{
               elements: {
-                userButtonAvatarBox: cn(
-                  "h-9 w-9 border border-gray-200 dark:border-gray-700 rounded-full"
-                ),
+                userButtonAvatarBox:
+                  "h-9 w-9 border-2 border-white dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow rounded-full",
               },
             }}
           />
         </div>
       </div>
-    </nav>
+    </div>
   );
-};
+}
