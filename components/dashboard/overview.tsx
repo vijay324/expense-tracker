@@ -72,7 +72,7 @@ export function Overview() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[350px]">
-        <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-full h-full"></div>
+        <div className="animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded w-full h-full"></div>
       </div>
     );
   }

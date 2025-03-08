@@ -99,6 +99,15 @@ export function ExpensesTable({
         format(new Date(expense.date), "MMM dd, yyyy"),
     },
     {
+      header: "Amount",
+      accessorKey: "amount" as keyof Expense,
+      cell: (expense: Expense) => (
+        <span className="font-medium text-red-600 ">
+          ₹{expense.amount.toFixed(2)}
+        </span>
+      ),
+    },
+    {
       header: "Category",
       accessorKey: "category" as keyof Expense,
       cell: (expense: Expense) => (
@@ -114,13 +123,6 @@ export function ExpensesTable({
         <span className="inline-block max-w-[200px] truncate">
           {expense.description || "-"}
         </span>
-      ),
-    },
-    {
-      header: "Amount",
-      accessorKey: "amount" as keyof Expense,
-      cell: (expense: Expense) => (
-        <span className="font-medium">₹{expense.amount.toFixed(2)}</span>
       ),
     },
   ];

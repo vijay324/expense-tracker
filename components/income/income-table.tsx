@@ -98,6 +98,15 @@ export function IncomeTable({
       cell: (income: Income) => format(new Date(income.date), "MMM dd, yyyy"),
     },
     {
+      header: "Amount",
+      accessorKey: "amount" as keyof Income,
+      cell: (income: Income) => (
+        <span className="font-medium text-green-600 dark:text-green-400">
+          ₹{income.amount.toFixed(2)}
+        </span>
+      ),
+    },
+    {
       header: "Category",
       accessorKey: "category" as keyof Income,
       cell: (income: Income) => (
@@ -112,15 +121,6 @@ export function IncomeTable({
       cell: (income: Income) => (
         <span className="inline-block max-w-[200px] truncate">
           {income.description || "-"}
-        </span>
-      ),
-    },
-    {
-      header: "Amount",
-      accessorKey: "amount" as keyof Income,
-      cell: (income: Income) => (
-        <span className="font-medium text-green-600 dark:text-green-400">
-          ₹{income.amount.toFixed(2)}
         </span>
       ),
     },
@@ -141,7 +141,7 @@ export function IncomeTable({
       {/* Edit Modal */}
       {isEditing && incomeToEdit && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full max-w-md p-6">
             <h2 className="text-xl font-semibold mb-4">Edit Income</h2>
             <IncomeForm
               initialData={{

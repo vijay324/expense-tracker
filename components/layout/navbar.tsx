@@ -25,12 +25,12 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-4 lg:px-6">
+    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 lg:px-6">
       <div className="h-full flex items-center justify-between">
         {/* Left section - Page Title (visible on desktop) */}
         <div className="flex items-center">
           <div className="hidden lg:flex items-center">
-            <h1 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+            <h1 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
               {getPageTitle()}
             </h1>
           </div>
@@ -41,10 +41,10 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
               <span className="text-white font-bold text-lg">ET</span>
             </div>
             <h1 className="text-lg font-bold">
-              <span className="hidden xs:inline bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+              <span className="hidden xs:inline bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
                 Expense
               </span>
-              <span className="xs:hidden bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+              <span className="xs:hidden bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
                 E
               </span>
               <span className="text-primary">Tracker</span>
@@ -60,14 +60,14 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className="h-9 w-9 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 shadow-sm"
+              className="h-9 w-9 rounded-full bg-zinc-100/40 dark:bg-zinc-900/80 shadow-sm"
             >
               <Menu className="h-4 w-4" />
             </Button>
           )}
 
           {/* Theme toggle */}
-          <div className="p-1.5 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 shadow-sm">
+          <div className=" rounded-full bg-zinc-100/40 dark:bg-zinc-900/80 shadow-sm">
             <ModeToggle />
           </div>
 
@@ -77,7 +77,7 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
             appearance={{
               elements: {
                 userButtonAvatarBox:
-                  "h-9 w-9 border-2 border-white dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow rounded-full",
+                  "h-9 w-9 border-2 border-white dark:border-zinc-900 shadow-sm hover:shadow-md transition-shadow rounded-full",
               },
             }}
           />

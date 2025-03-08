@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, DollarSign, CreditCard, PiggyBank, X } from "lucide-react";
+import {
+  Home,
+  IndianRupee,
+  DollarSign,
+  CreditCard,
+  LayoutDashboard,
+  TrendingDown,
+  PiggyBank,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -13,21 +22,21 @@ interface SidebarProps {
 const routes = [
   {
     label: "Dashboard",
-    icon: <Home className="h-5 w-5" />,
+    icon: <LayoutDashboard className="h-5 w-5" />,
     href: "/",
     color: "text-sky-500",
   },
   {
     label: "Income",
-    icon: <DollarSign className="h-5 w-5" />,
+    icon: <IndianRupee className="h-5 w-5" />,
     href: "/income",
     color: "text-emerald-500",
   },
   {
     label: "Expenses",
-    icon: <CreditCard className="h-5 w-5" />,
+    icon: <TrendingDown className="h-5 w-5" />,
     href: "/expenses",
-    color: "text-violet-500",
+    color: "text-rose-500",
   },
   {
     label: "Budget",

@@ -50,16 +50,16 @@ export function BudgetList({ budgets: initialBudgets }: BudgetListProps) {
 
   if (isLoading && !budgets.length) {
     return (
-      <div className="text-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">Loading budgets...</p>
+      <div className="text-center p-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+        <p className="text-zinc-500 dark:text-zinc-400">Loading budgets...</p>
       </div>
     );
   }
 
   if (!budgets.length) {
     return (
-      <div className="text-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">
+      <div className="text-center p-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+        <p className="text-zinc-500 dark:text-zinc-400">
           No budgets found. Add your first budget!
         </p>
       </div>

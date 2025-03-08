@@ -73,21 +73,21 @@ export function IncomeItem({ income, onDelete }: IncomeItemProps) {
                   ₹{income.amount.toFixed(2)}
                 </h3>
                 {income.description && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-zinc-500 mt-1">
                     {income.description}
                   </p>
                 )}
-                <p className="text-xs text-gray-400 mt-2">{formattedDate}</p>
+                <p className="text-xs text-zinc-400 mt-2">{formattedDate}</p>
               </div>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-end gap-2 p-2 bg-gray-50 dark:bg-gray-800/50">
+        <CardFooter className="flex justify-end gap-2 p-2 bg-zinc-50 dark:bg-zinc-800/50">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsEditing(true)}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
           >
             <Edit className="h-4 w-4 mr-1" />
             Edit
@@ -107,7 +107,7 @@ export function IncomeItem({ income, onDelete }: IncomeItemProps) {
       {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full max-w-md p-6">
             <h2 className="text-xl font-semibold mb-4">Edit Income</h2>
             <IncomeForm
               initialData={{

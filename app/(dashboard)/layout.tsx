@@ -42,7 +42,7 @@ export default function DashboardLayout({
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <div className="h-full relative bg-gray-50 dark:bg-gray-900">
+      <div className="h-full relative bg-zinc-50 dark:bg-black">
         {/* Sidebar */}
         <div
           className={cn(

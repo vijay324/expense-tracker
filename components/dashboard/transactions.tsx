@@ -45,12 +45,12 @@ export function RecentTransactions() {
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center animate-pulse">
-            <div className="bg-gray-200 dark:bg-gray-700 h-10 w-10 rounded-full mr-4"></div>
+            <div className="bg-zinc-200 dark:bg-zinc-700 h-10 w-10 rounded-full mr-4"></div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4"></div>
+              <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2"></div>
             </div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+            <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-16"></div>
           </div>
         ))}
       </div>
@@ -60,8 +60,8 @@ export function RecentTransactions() {
   if (transactions.length === 0) {
     return (
       <div className="text-center py-8 px-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
-          <Calendar className="h-8 w-8 text-gray-500" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 mb-4">
+          <Calendar className="h-8 w-8 text-zinc-500" />
         </div>
         <h3 className="text-lg font-medium mb-2">No transactions yet</h3>
         <p className="text-sm text-muted-foreground max-w-sm mx-auto">

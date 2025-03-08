@@ -78,12 +78,12 @@ export default function DashboardPage() {
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+                <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-700"></div>
               </CardHeader>
               <CardContent>
-                <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-8 w-32 bg-zinc-200 dark:bg-zinc-700 rounded mb-2"></div>
+                <div className="h-4 w-48 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
               </CardContent>
             </Card>
           ))}
@@ -91,22 +91,22 @@ export default function DashboardPage() {
         <div className="grid gap-4 mt-6 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-full lg:col-span-4 animate-pulse">
             <CardHeader>
-              <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-6 w-32 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-64 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-64 w-full bg-zinc-200 dark:bg-zinc-700 rounded"></div>
             </CardContent>
           </Card>
           <Card className="col-span-full lg:col-span-3 animate-pulse">
             <CardHeader>
-              <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-6 w-48 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded"
+                    className="h-16 w-full bg-zinc-200 dark:bg-zinc-700 rounded"
                   ></div>
                 ))}
               </div>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                 <span>{budgetPercentage}% used</span>
                 <span>{100 - budgetPercentage}% left</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+              <div className="w-full bg-zinc-200 rounded-full h-2.5 dark:bg-zinc-700">
                 <div
                   className={`h-2.5 rounded-full ${
                     budgetPercentage > 90

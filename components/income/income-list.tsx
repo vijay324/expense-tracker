@@ -51,8 +51,8 @@ export function IncomeList({ incomes: initialIncomes }: IncomeListProps) {
 
   if (isLoading && !incomes.length) {
     return (
-      <div className="text-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">
+      <div className="text-center p-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+        <p className="text-zinc-500 dark:text-zinc-400">
           Loading income entries...
         </p>
       </div>
@@ -61,8 +61,8 @@ export function IncomeList({ incomes: initialIncomes }: IncomeListProps) {
 
   if (!incomes.length) {
     return (
-      <div className="text-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">
+      <div className="text-center p-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+        <p className="text-zinc-500 dark:text-zinc-400">
           No income entries found. Add your first income!
         </p>
       </div>
