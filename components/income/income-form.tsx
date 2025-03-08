@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,25 +25,51 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 const formSchema = z.object({
-  amount: z.string().min(1, {
-    message: "Amount is required.",
-  }),
+  amount: z
+    .string()
+    .min(1, { message: "Amount is required." })
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: "Amount must be a positive number.",
+    }),
   category: z.string().min(1, {
     message: "Please select a category.",
   }),
-  description: z.string().optional(),
-  date: z.string().min(1, {
-    message: "Date is required.",
-  }),
+  description: z
+    .string()
+    .max(100, { message: "Description cannot exceed 100 characters." })
+    .optional(),
+  date: z
+    .string()
+    .min(1, { message: "Date is required." })
+    .refine((val) => !isNaN(Date.parse(val)), {
+      message: "Please enter a valid date.",
+    }),
 });
 
-export function IncomeForm() {
+interface IncomeFormProps {
+  initialData?: {
+    id: string;
+    amount: string;
+    category: string;
+    description: string;
+    date: string;
+  };
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export function IncomeForm({
+  initialData,
+  onSuccess,
+  onCancel,
+}: IncomeFormProps = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const isEditing = !!initialData?.id;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       amount: "",
       category: "",
       description: "",
@@ -55,8 +81,12 @@ export function IncomeForm() {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/income", {
-        method: "POST",
+      const url = isEditing ? `/api/income/${initialData.id}` : "/api/income";
+
+      const method = isEditing ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -64,12 +94,19 @@ export function IncomeForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create income entry");
+        throw new Error(
+          `Failed to ${isEditing ? "update" : "create"} income entry`
+        );
       }
 
-      toast.success("Income added successfully!");
-      form.reset();
-      router.refresh();
+      toast.success(`Income ${isEditing ? "updated" : "added"} successfully!`);
+
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        form.reset();
+        router.refresh();
+      }
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong. Please try again.");
@@ -81,71 +118,96 @@ export function IncomeForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount (₹)</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="0.00" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Amount (₹)</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
+                  <Input type="number" placeholder="0.00" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Startup">Startup</SelectItem>
-                  <SelectItem value="Job">Job</SelectItem>
-                  <SelectItem value="Freelance">Freelance</SelectItem>
-                  <SelectItem value="Social Media">Social Media</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Startup">Startup</SelectItem>
+                    <SelectItem value="Job">Job</SelectItem>
+                    <SelectItem value="Freelance">Freelance</SelectItem>
+                    <SelectItem value="Social Media">Social Media</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Description (optional)" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex justify-end">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="mr-2"
+            >
+              Cancel
+            </Button>
           )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input placeholder="Description (optional)" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Adding..." : "Add Income"}
-        </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading
+              ? isEditing
+                ? "Updating..."
+                : "Adding..."
+              : isEditing
+              ? "Update Income"
+              : "Add Income"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

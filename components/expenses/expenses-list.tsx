@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IncomeItem } from "./income-item";
+import { ExpenseItem } from "./expense-item";
 import { toast } from "react-hot-toast";
 
-interface Income {
+interface Expense {
   id: string;
   amount: number;
   category: string;
@@ -13,57 +13,55 @@ interface Income {
   createdAt: string | Date;
 }
 
-interface IncomeListProps {
-  incomes: Income[];
+interface ExpensesListProps {
+  expenses: Expense[];
 }
 
-export function IncomeList({ incomes: initialIncomes }: IncomeListProps) {
-  const [incomes, setIncomes] = useState<Income[]>(initialIncomes);
+export function ExpensesList({ expenses: initialExpenses }: ExpensesListProps) {
+  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch incomes on mount and set up interval for real-time updates
+  // Fetch expenses on mount and set up interval for real-time updates
   useEffect(() => {
-    const fetchIncomes = async () => {
+    const fetchExpenses = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/income");
+        const response = await fetch("/api/expenses");
         if (!response.ok) {
-          throw new Error("Failed to fetch income entries");
+          throw new Error("Failed to fetch expenses");
         }
         const data = await response.json();
-        setIncomes(data);
+        setExpenses(data);
       } catch (error) {
-        console.error("Error fetching income:", error);
+        console.error("Error fetching expenses:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     // Initial fetch
-    fetchIncomes();
+    fetchExpenses();
 
     // Set up interval for real-time updates (every 5 seconds)
-    const intervalId = setInterval(fetchIncomes, 5000);
+    const intervalId = setInterval(fetchExpenses, 5000);
 
     // Clean up interval on unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  if (isLoading && !incomes.length) {
+  if (isLoading && !expenses.length) {
     return (
       <div className="text-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">
-          Loading income entries...
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">Loading expenses...</p>
       </div>
     );
   }
 
-  if (!incomes.length) {
+  if (!expenses.length) {
     return (
       <div className="text-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
         <p className="text-gray-500 dark:text-gray-400">
-          No income entries found. Add your first income!
+          No expenses found. Add your first expense!
         </p>
       </div>
     );
@@ -71,12 +69,12 @@ export function IncomeList({ incomes: initialIncomes }: IncomeListProps) {
 
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {incomes.map((income) => (
-        <IncomeItem
-          key={income.id}
-          income={income}
+      {expenses.map((expense) => (
+        <ExpenseItem
+          key={expense.id}
+          expense={expense}
           onDelete={(id) => {
-            setIncomes(incomes.filter((i) => i.id !== id));
+            setExpenses(expenses.filter((e) => e.id !== id));
           }}
         />
       ))}
