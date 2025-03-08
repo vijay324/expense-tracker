@@ -17,12 +17,15 @@ import {
   Calendar,
   BarChart4,
   PieChart,
+  IndianRupee,
+  PiggyBank,
 } from "lucide-react";
 import { Overview } from "@/components/dashboard/overview";
 import { RecentTransactions } from "@/components/dashboard/transactions";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { BudgetAlert } from "@/components/expenses/budget-alert";
 
 interface DashboardData {
   totalIncome: number;
@@ -159,13 +162,16 @@ export default function DashboardPage() {
         <QuickActions />
       </div>
 
+      {/* Budget Alert */}
+      <BudgetAlert totalExpenses={totalExpenses} budgetAmount={budgetAmount} />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Total Income Card */}
         <Card className="overflow-hidden border-l-4 border-l-emerald-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
             <CardTitle className="text-sm font-medium">Total Income</CardTitle>
             <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-              <DollarSign className="h-4 w-4 text-emerald-500" />
+              <IndianRupee className="h-4 w-4 text-emerald-500" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
@@ -187,7 +193,7 @@ export default function DashboardPage() {
               Total Expenses
             </CardTitle>
             <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center">
-              <CreditCard className="h-4 w-4 text-rose-500" />
+              <TrendingDown className="h-4 w-4 text-rose-500" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
@@ -209,7 +215,7 @@ export default function DashboardPage() {
               Budget Remaining
             </CardTitle>
             <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 text-blue-500" />
+              <PiggyBank className="h-4 w-4 text-blue-500" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">

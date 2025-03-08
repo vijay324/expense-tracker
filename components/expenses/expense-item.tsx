@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { ExpenseForm } from "./expense-form";
+import { getExpenseCategoryColor } from "@/lib/category-colors";
 
 interface ExpenseItemProps {
   expense: {
@@ -66,7 +67,11 @@ export function ExpenseItem({ expense, onDelete }: ExpenseItemProps) {
           <div className="p-4 sm:p-6">
             <div className="flex items-start justify-between">
               <div>
-                <Badge variant="outline" className="mb-2">
+                <Badge
+                  className={`mb-2 ${getExpenseCategoryColor(
+                    expense.category
+                  )}`}
+                >
                   {expense.category}
                 </Badge>
                 <h3 className="text-lg font-semibold">

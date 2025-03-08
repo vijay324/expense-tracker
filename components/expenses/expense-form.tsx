@@ -159,6 +159,9 @@ export function ExpenseForm({
                     <SelectItem value="Education & Courses">
                       Education & Courses
                     </SelectItem>
+                    <SelectItem value="Health & Fitness">
+                      Health & Fitness
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

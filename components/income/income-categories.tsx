@@ -9,6 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Briefcase, DollarSign, Code, Youtube } from "lucide-react";
+import {
+  getIncomeCategoryBorderColor,
+  getIncomeCategoryBgColor,
+  getIncomeCategoryTextColor,
+} from "@/lib/category-colors";
 
 interface CategorySummary {
   category: string;
@@ -21,17 +26,19 @@ interface IncomeCategoriesProps {
 }
 
 const getCategoryIcon = (category: string) => {
+  const textColorClass = getIncomeCategoryTextColor(category);
+
   switch (category) {
     case "Job":
-      return <Briefcase className="h-5 w-5 text-emerald-500" />;
+      return <Briefcase className={`h-5 w-5 ${textColorClass}`} />;
     case "Startup":
-      return <DollarSign className="h-5 w-5 text-blue-500" />;
+      return <DollarSign className={`h-5 w-5 ${textColorClass}`} />;
     case "Freelance":
-      return <Code className="h-5 w-5 text-purple-500" />;
+      return <Code className={`h-5 w-5 ${textColorClass}`} />;
     case "Social Media":
-      return <Youtube className="h-5 w-5 text-red-500" />;
+      return <Youtube className={`h-5 w-5 ${textColorClass}`} />;
     default:
-      return <DollarSign className="h-5 w-5 text-gray-500" />;
+      return <DollarSign className={`h-5 w-5 ${textColorClass}`} />;
   }
 };
 
@@ -85,29 +92,36 @@ export function IncomeCategories({ incomes }: IncomeCategoriesProps) {
     <div>
       <h3 className="text-lg font-medium mb-4">Income Categories</h3>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {categorySummaries.map((summary) => (
-          <Card
-            key={summary.category}
-            className="overflow-hidden border-l-4 border-l-emerald-500"
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
-              <CardTitle className="text-sm font-medium">
-                {summary.category}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                {getCategoryIcon(summary.category)}
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="text-2xl font-bold">
-                ₹{summary.total.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {summary.count} {summary.count === 1 ? "source" : "sources"}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        {categorySummaries.map((summary) => {
+          const borderColor = getIncomeCategoryBorderColor(summary.category);
+          const bgColor = getIncomeCategoryBgColor(summary.category);
+
+          return (
+            <Card
+              key={summary.category}
+              className={`overflow-hidden border-l-4 ${borderColor}`}
+            >
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
+                <CardTitle className="text-sm font-medium">
+                  {summary.category}
+                </CardTitle>
+                <div
+                  className={`h-8 w-8 rounded-full ${bgColor} flex items-center justify-center`}
+                >
+                  {getCategoryIcon(summary.category)}
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="text-2xl font-bold">
+                  ₹{summary.total.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {summary.count} {summary.count === 1 ? "source" : "sources"}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

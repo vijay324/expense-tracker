@@ -1,13 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, ArrowUpDown, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { ExpenseForm } from "@/components/expenses/expense-form";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { getExpenseCategoryColor } from "@/lib/category-colors";
 
 interface Expense {
   id: string;
@@ -38,7 +50,34 @@ export function ExpensesTable({
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
+
+  // Sorting state
+  const [sortField, setSortField] = useState<keyof Expense>("date");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+  // Filtering state
+  const [filters, setFilters] = useState<{
+    category: string;
+    minAmount: string;
+    maxAmount: string;
+    startDate: string;
+    endDate: string;
+  }>({
+    category: "",
+    minAmount: "",
+    maxAmount: "",
+    startDate: "",
+    endDate: "",
+  });
+
   const router = useRouter();
+
+  // Get unique categories for filter dropdown
+  const uniqueCategories = useMemo(() => {
+    const categories = new Set<string>();
+    expenses.forEach((expense) => categories.add(expense.category));
+    return Array.from(categories).sort();
+  }, [expenses]);
 
   // Fetch expenses on mount and set up interval for real-time updates
   const fetchExpenses = async () => {
@@ -100,33 +139,135 @@ export function ExpensesTable({
     setIsEditing(true);
   };
 
+  // Handle sorting
+  const handleSort = (field: keyof Expense) => {
+    if (field === sortField) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to descending for dates, ascending for others
+      setSortField(field);
+      setSortDirection(field === "date" ? "desc" : "asc");
+    }
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setFilters({
+      category: "",
+      minAmount: "",
+      maxAmount: "",
+      startDate: "",
+      endDate: "",
+    });
+  };
+
+  // Apply sorting and filtering
+  const filteredAndSortedExpenses = useMemo(() => {
+    // First apply filters
+    let result = [...expenses];
+
+    // Filter by category
+    if (filters.category) {
+      result = result.filter(
+        (expense) => expense.category === filters.category
+      );
+    }
+
+    // Filter by amount range
+    if (filters.minAmount) {
+      result = result.filter(
+        (expense) => expense.amount >= parseFloat(filters.minAmount)
+      );
+    }
+
+    if (filters.maxAmount) {
+      result = result.filter(
+        (expense) => expense.amount <= parseFloat(filters.maxAmount)
+      );
+    }
+
+    // Filter by date range
+    if (filters.startDate) {
+      const startDate = new Date(filters.startDate);
+      result = result.filter((expense) => new Date(expense.date) >= startDate);
+    }
+
+    if (filters.endDate) {
+      const endDate = new Date(filters.endDate);
+      endDate.setHours(23, 59, 59, 999); // End of day
+      result = result.filter((expense) => new Date(expense.date) <= endDate);
+    }
+
+    // Then apply sorting
+    result.sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+
+      // Handle different types of values
+      if (sortField === "date" || sortField === "createdAt") {
+        const aDate = new Date(aValue as string | Date).getTime();
+        const bDate = new Date(bValue as string | Date).getTime();
+        return sortDirection === "asc" ? aDate - bDate : bDate - aDate;
+      } else if (sortField === "amount") {
+        return sortDirection === "asc"
+          ? a.amount - b.amount
+          : b.amount - a.amount;
+      } else {
+        // String comparison for other fields
+        const aString = String(aValue).toLowerCase();
+        const bString = String(bValue).toLowerCase();
+        return sortDirection === "asc"
+          ? aString.localeCompare(bString)
+          : bString.localeCompare(aString);
+      }
+    });
+
+    return result;
+  }, [expenses, sortField, sortDirection, filters]);
+
+  // Get sort indicator
+  const getSortIndicator = (field: keyof Expense) => {
+    if (field !== sortField) return null;
+    return sortDirection === "asc" ? " ↑" : " ↓";
+  };
+
   const columns = [
     {
-      header: "Date ↓",
+      header: `Date${getSortIndicator("date")}`,
       accessorKey: "date" as keyof Expense,
       cell: (expense: Expense) =>
         format(new Date(expense.date), "MMM dd, yyyy"),
     },
     {
-      header: "Amount",
+      header: `Amount${getSortIndicator("amount")}`,
       accessorKey: "amount" as keyof Expense,
       cell: (expense: Expense) => (
-        <span className="font-medium text-red-600 ">
+        <span className="font-medium text-red-600 dark:text-red-400">
           ₹{expense.amount.toFixed(2)}
         </span>
       ),
     },
     {
-      header: "Category",
+      header: `Category${getSortIndicator("category")}`,
       accessorKey: "category" as keyof Expense,
       cell: (expense: Expense) => (
-        <span className="inline-block max-w-[150px] truncate">
+        <Badge
+          className={`${getExpenseCategoryColor(
+            expense.category
+          )} inline-block max-w-[150px] truncate`}
+        >
           {expense.category}
-        </span>
+        </Badge>
       ),
     },
     {
-      header: "Description",
+      header: `Description${getSortIndicator("description")}`,
       accessorKey: "description" as keyof Expense,
       cell: (expense: Expense) => (
         <span className="inline-block max-w-[200px] truncate">
@@ -136,10 +277,145 @@ export function ExpensesTable({
     },
   ];
 
+  // Active filters count for badge
+  const activeFiltersCount = Object.values(filters).filter(
+    (v) => v !== ""
+  ).length;
+
   return (
     <>
+      <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
+        <div className="flex flex-wrap gap-2">
+          {/* Sorting dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <ArrowUpDown className="mr-2 h-4 w-4" />
+                Sort
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem onClick={() => handleSort("date")}>
+                Date{" "}
+                {sortField === "date" && (sortDirection === "asc" ? "↑" : "↓")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort("amount")}>
+                Amount{" "}
+                {sortField === "amount" &&
+                  (sortDirection === "asc" ? "↑" : "↓")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort("category")}>
+                Category{" "}
+                {sortField === "category" &&
+                  (sortDirection === "asc" ? "↑" : "↓")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Filter popover */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <Filter className="mr-2 h-4 w-4" />
+                Filter
+                {activeFiltersCount > 0 && (
+                  <Badge
+                    className="ml-1 bg-primary text-primary-foreground"
+                    variant="secondary"
+                  >
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <h4 className="font-medium">Filter Expenses</h4>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <select
+                    id="category"
+                    className="w-full p-2 border rounded-md dark:bg-zinc-800 dark:border-zinc-700"
+                    value={filters.category}
+                    onChange={(e) =>
+                      handleFilterChange("category", e.target.value)
+                    }
+                  >
+                    <option value="">All Categories</option>
+                    {uniqueCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="minAmount">Min Amount</Label>
+                    <Input
+                      id="minAmount"
+                      type="number"
+                      placeholder="0"
+                      value={filters.minAmount}
+                      onChange={(e) =>
+                        handleFilterChange("minAmount", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="maxAmount">Max Amount</Label>
+                    <Input
+                      id="maxAmount"
+                      type="number"
+                      placeholder="Max"
+                      value={filters.maxAmount}
+                      onChange={(e) =>
+                        handleFilterChange("maxAmount", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Start Date</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={filters.startDate}
+                      onChange={(e) =>
+                        handleFilterChange("startDate", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">End Date</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={filters.endDate}
+                      onChange={(e) =>
+                        handleFilterChange("endDate", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <Button variant="outline" size="sm" onClick={resetFilters}>
+                    Reset
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
       <DataTable
-        data={expenses}
+        data={filteredAndSortedExpenses}
         columns={columns}
         onEdit={handleEdit}
         onDelete={(expense) => {
@@ -151,7 +427,7 @@ export function ExpensesTable({
       {/* Edit Modal */}
       {isEditing && expenseToEdit && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full max-w-md p-6">
             <h2 className="text-xl font-semibold mb-4">Edit Expense</h2>
             <ExpenseForm
               initialData={{

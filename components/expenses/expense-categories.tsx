@@ -14,7 +14,13 @@ import {
   BookOpen,
   Plane,
   Coffee,
+  Dumbbell,
 } from "lucide-react";
+import {
+  getExpenseCategoryBorderColor,
+  getExpenseCategoryBgColor,
+  getExpenseCategoryTextColor,
+} from "@/lib/category-colors";
 
 interface CategorySummary {
   category: string;
@@ -27,17 +33,21 @@ interface ExpenseCategoriesProps {
 }
 
 const getCategoryIcon = (category: string) => {
+  const textColorClass = getExpenseCategoryTextColor(category);
+
   switch (category) {
     case "Bills & Recharge":
-      return <CreditCard className="h-5 w-5 text-blue-500" />;
+      return <CreditCard className={`h-5 w-5 ${textColorClass}`} />;
     case "Traveling":
-      return <Plane className="h-5 w-5 text-purple-500" />;
+      return <Plane className={`h-5 w-5 ${textColorClass}`} />;
     case "Entertainment":
-      return <Coffee className="h-5 w-5 text-amber-500" />;
+      return <Coffee className={`h-5 w-5 ${textColorClass}`} />;
     case "Education & Courses":
-      return <BookOpen className="h-5 w-5 text-emerald-500" />;
+      return <BookOpen className={`h-5 w-5 ${textColorClass}`} />;
+    case "Health & Fitness":
+      return <Dumbbell className={`h-5 w-5 ${textColorClass}`} />;
     default:
-      return <ShoppingCart className="h-5 w-5 text-gray-500" />;
+      return <ShoppingCart className={`h-5 w-5 ${textColorClass}`} />;
   }
 };
 
@@ -91,29 +101,36 @@ export function ExpenseCategories({ expenses }: ExpenseCategoriesProps) {
     <div>
       <h3 className="text-lg font-medium mb-4">Expense Categories</h3>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {categorySummaries.map((summary) => (
-          <Card
-            key={summary.category}
-            className="overflow-hidden border-l-4 border-l-blue-500"
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
-              <CardTitle className="text-sm font-medium">
-                {summary.category}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                {getCategoryIcon(summary.category)}
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="text-2xl font-bold">
-                ₹{summary.total.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {summary.count} {summary.count === 1 ? "expense" : "expenses"}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        {categorySummaries.map((summary) => {
+          const borderColor = getExpenseCategoryBorderColor(summary.category);
+          const bgColor = getExpenseCategoryBgColor(summary.category);
+
+          return (
+            <Card
+              key={summary.category}
+              className={`overflow-hidden border-l-4 ${borderColor}`}
+            >
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
+                <CardTitle className="text-sm font-medium">
+                  {summary.category}
+                </CardTitle>
+                <div
+                  className={`h-8 w-8 rounded-full ${bgColor} flex items-center justify-center`}
+                >
+                  {getCategoryIcon(summary.category)}
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="text-2xl font-bold">
+                  ₹{summary.total.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {summary.count} {summary.count === 1 ? "expense" : "expenses"}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

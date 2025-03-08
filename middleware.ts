@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // Define which routes should be public (accessible without authentication)
 const isPublicRoute = createRouteMatcher([
@@ -8,21 +9,19 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhook(.*)",
 ]);
 
-// Define which routes should bypass authentication check but still have auth context
-const isApiRoute = createRouteMatcher([
-  "/api/(.*)", // All API routes
-]);
-
 // Protect all routes except public ones
-export default clerkMiddleware((auth, request) => {
-  // Allow API routes to proceed with auth context but without requiring authentication
-  if (isApiRoute(request)) {
-    return;
-  }
+export default clerkMiddleware(async (auth, req) => {
+  // If the user is not authenticated and trying to access a protected route,
+  // redirect them to the sign-in page
+  if (!isPublicRoute(req)) {
+    const { userId } = await auth();
 
-  // Protect non-public routes
-  if (!isPublicRoute(request)) {
-    auth.protect();
+    // If not authenticated, redirect to sign-in
+    if (!userId) {
+      const signInUrl = new URL("/sign-in", req.url);
+      signInUrl.searchParams.set("redirect_url", req.url);
+      return NextResponse.redirect(signInUrl);
+    }
   }
 });
 

@@ -56,7 +56,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm border-r border-gray-200/50 dark:border-gray-800/50 shadow-sm">
+    <div className="h-full flex flex-col bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       {/* Mobile close button */}
       {closeMobileSidebar && (
         <div className="absolute top-4 right-4 lg:hidden">
@@ -64,7 +64,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
             variant="ghost"
             size="icon"
             onClick={closeMobileSidebar}
-            className="rounded-full h-8 w-8 bg-white/90 dark:bg-gray-800/90 shadow-sm hover:shadow-md transition-all"
+            className="rounded-full h-8 w-8 bg-white/90 dark:bg-zinc-800/90 shadow-sm hover:shadow-md transition-all"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -77,7 +77,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-xl">ET</span>
           </div>
-          <span className="ml-3 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 truncate">
+          <span className="ml-3 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 truncate">
             <span className="hidden sm:inline">Expense</span>
             <span className="sm:hidden">E</span>
             <span className="text-primary">Tracker</span>
@@ -97,7 +97,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
                 "flex items-center gap-x-3 text-sm font-medium px-4 py-3 rounded-xl transition-all",
                 pathname === route.href
                   ? "bg-primary/10 text-primary shadow-sm"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 hover:shadow-sm"
+                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 hover:shadow-sm"
               )}
             >
               <div
@@ -105,7 +105,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
                   "flex items-center justify-center w-8 h-8 rounded-lg",
                   pathname === route.href
                     ? "bg-primary/10"
-                    : "bg-gray-100 dark:bg-gray-800"
+                    : "bg-zinc-100 dark:bg-zinc-800"
                 )}
               >
                 <div className={cn("shrink-0", route.color)}>{route.icon}</div>

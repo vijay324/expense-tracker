@@ -9,7 +9,17 @@ import {
 import { ExpensesTable } from "@/components/expenses/expenses-table";
 import { ExpenseCategories } from "@/components/expenses/expense-categories";
 import { ExpenseDialog } from "@/components/expenses/expense-dialog";
+import { ExpensesClient } from "../../../components/expenses/expenses-client";
 import prisma from "@/lib/db";
+
+interface Expense {
+  id: string;
+  amount: number;
+  category: string;
+  description: string | null;
+  date: string | Date;
+  createdAt: string | Date;
+}
 
 async function getExpenses() {
   try {
@@ -46,48 +56,56 @@ async function getExpenses() {
   }
 }
 
+async function getBudgetAmount() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return 0;
+    }
+
+    // Get the user from our database
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+    });
+
+    if (!user) {
+      return 0;
+    }
+
+    // Get the latest budget for the user
+    const budget = await prisma.budget.findFirst({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return budget?.amount || 0;
+  } catch (error) {
+    console.error("Error fetching budget:", error);
+    return 0;
+  }
+}
+
 export default async function ExpensesPage() {
   const expenses = await getExpenses();
+  const budgetAmount = await getBudgetAmount();
+
+  // Calculate total expenses
+  const totalExpenses = expenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
 
   return (
-    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          Expenses
-        </h2>
-        <ExpenseDialog
-          buttonVariant="default"
-          buttonSize="default"
-          showIcon={true}
-          className="ml-4"
-        />
-      </div>
-
-      {/* Expense Categories */}
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl">Expense Categories</CardTitle>
-          <CardDescription>
-            Summary of your expenses by category
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ExpenseCategories expenses={expenses} />
-        </CardContent>
-      </Card>
-
-      {/* Expense List Card */}
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl">Expense List</CardTitle>
-          <CardDescription>
-            View and manage your expense entries
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ExpensesTable expenses={expenses} />
-        </CardContent>
-      </Card>
-    </div>
+    <ExpensesClient
+      initialExpenses={expenses}
+      initialBudgetAmount={budgetAmount}
+      initialTotalExpenses={totalExpenses}
+    />
   );
 }
