@@ -1,5 +1,5 @@
-// This file is intentionally left empty as we're not using it
-// We'll implement a different approach for date selection
+// This file is intentionally left empty
+// We're using a custom date picker implementation that doesn't rely on react-day-picker
 
 "use client";
 
