@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseDialog } from "@/components/expenses/expense-dialog";
 import { IncomeDialog } from "@/components/income/income-dialog";
+import { CategoryInfoDialog } from "@/components/categories/category-info-dialog";
 import { useRouter } from "next/navigation";
 
 export function QuickActions() {
@@ -25,9 +26,13 @@ export function QuickActions() {
             onSuccess={handleSuccess}
           />
           <IncomeDialog
-            buttonVariant="outline"
-            className="w-full sm:w-auto"
+            buttonVariant="default"
+            className="w-full sm:w-auto mx-2"
             onSuccess={handleSuccess}
+          />
+          <CategoryInfoDialog
+            buttonVariant="outline"
+            className="w-full sm:w-auto mx-2"
           />
         </div>
       </CardContent>
