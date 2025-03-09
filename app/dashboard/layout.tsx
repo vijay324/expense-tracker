@@ -62,7 +62,7 @@ export default function DashboardLayout({
         )}
 
         {/* Main content */}
-        <div className="lg:pl-64 xl:pl-72 min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col">
           <Navbar toggleSidebar={toggleSidebar} isMobile={isMobile} />
           <main className="flex-1 pt-8 px-4 md:px-6 lg:px-8 pb-8">
             <div className="max-w-7xl mx-auto">{children}</div>

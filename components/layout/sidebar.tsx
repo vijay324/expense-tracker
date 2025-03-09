@@ -59,7 +59,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
   const isDashboardActive = pathname === "/dashboard" || pathname === "/";
 
   return (
-    <div className="h-full flex flex-col bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+    <div className="h-full flex flex-col bg-white/80 dark:bg-zinc-900/90 backdrop-blur-xs border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       {/* Mobile close button */}
       {closeMobileSidebar && (
         <div className="absolute top-4 right-4 lg:hidden">
@@ -101,7 +101,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
                 (route.href === "/dashboard" && isDashboardActive) ||
                   (route.href !== "/dashboard" && pathname === route.href)
                   ? "bg-primary/10 text-primary shadow-sm"
-                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 hover:shadow-sm"
+                  : "text-zinc-700 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800/60 hover:shadow-sm"
               )}
             >
               <div
@@ -109,8 +109,8 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
                   "flex items-center justify-center w-8 h-8 rounded-lg",
                   (route.href === "/dashboard" && isDashboardActive) ||
                     (route.href !== "/dashboard" && pathname === route.href)
-                    ? "bg-primary/10"
-                    : "bg-zinc-100/30 dark:bg-zinc-800"
+                    ? "bg-white dark:bg-black"
+                    : "bg-white dark:bg-zinc-800"
                 )}
               >
                 <div className={cn("shrink-0", route.color)}>{route.icon}</div>
