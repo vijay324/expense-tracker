@@ -2,6 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 import { ExpensesClient } from "../../../components/expenses/expenses-client";
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 interface Expense {
   id: string;
   amount: number;

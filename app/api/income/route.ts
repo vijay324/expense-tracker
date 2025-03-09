@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 interface Income {
   id: string;
   createdAt: Date;

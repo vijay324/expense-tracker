@@ -12,7 +12,11 @@ interface User {
   updatedAt: Date;
 }
 
-export const GET: Handler<User> = async (req) => {
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
+// Initialize or get user
+export async function GET() {
   try {
     const { userId } = await auth();
 
@@ -20,32 +24,36 @@ export const GET: Handler<User> = async (req) => {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Find user in our database
-    const user = await prisma.user.findUnique({
+    // Check if user exists in our database
+    let user = await prisma.user.findUnique({
       where: {
         clerkId: userId,
       },
     });
 
+    // If user doesn't exist, create a new user
     if (!user) {
-      // If user doesn't exist, create them
-      const clerkUser = await currentUser();
-
-      if (!clerkUser) {
-        return new NextResponse("User not found", { status: 404 });
-      }
-
-      const newUser = await prisma.user.create({
-        data: {
-          clerkId: userId,
-          email: clerkUser.emailAddresses[0]?.emailAddress || "",
-          name: `${clerkUser.firstName || ""} ${
-            clerkUser.lastName || ""
-          }`.trim(),
+      // Get user details from Clerk
+      const response = await fetch(`https://api.clerk.dev/v1/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
         },
       });
 
-      return NextResponse.json(newUser);
+      if (!response.ok) {
+        throw new Error("Failed to fetch user from Clerk");
+      }
+
+      const clerkUser = await response.json();
+
+      // Create user in our database
+      user = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: clerkUser.email_addresses[0].email_address,
+          name: `${clerkUser.first_name} ${clerkUser.last_name}`,
+        },
+      });
     }
 
     return NextResponse.json(user);
@@ -53,7 +61,7 @@ export const GET: Handler<User> = async (req) => {
     console.error("[USER_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-};
+}
 
 export const POST: Handler<User> = async (req) => {
   try {

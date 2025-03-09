@@ -2,6 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 import { ReportsClient } from "@/components/reports/reports-client";
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 async function getYearsWithData() {
   try {
     const { userId } = await auth();

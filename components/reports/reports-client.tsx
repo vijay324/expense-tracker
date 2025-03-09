@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
@@ -94,7 +94,8 @@ const COLORS = [
   "#FF7300",
 ];
 
-export function ReportsClient({
+// Client component that uses search params
+function ReportsClientContent({
   yearsWithData,
   defaultYear,
 }: ReportsClientProps) {
@@ -819,6 +820,40 @@ export function ReportsClient({
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// Wrapper component with suspense
+export function ReportsClient(props: ReportsClientProps) {
+  return (
+    <Suspense fallback={<ReportsLoadingSkeleton />}>
+      <ReportsClientContent {...props} />
+    </Suspense>
+  );
+}
+
+// Loading skeleton component
+function ReportsLoadingSkeleton() {
+  return (
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-10 w-40" />
+      </div>
+
+      <Skeleton className="h-12 w-full" />
+
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+
+        <Skeleton className="h-[400px] w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
     </div>
   );
 }

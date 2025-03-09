@@ -11,6 +11,9 @@ import { IncomeCategories } from "@/components/income/income-categories";
 import { IncomeDialog } from "@/components/income/income-dialog";
 import prisma from "@/lib/db";
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 async function getIncomes() {
   try {
     const { userId } = await auth();
