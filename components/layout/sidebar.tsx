@@ -55,6 +55,9 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
     }
   };
 
+  // Check if the current path is the dashboard or root
+  const isDashboardActive = pathname === "/dashboard" || pathname === "/";
+
   return (
     <div className="h-full flex flex-col bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       {/* Mobile close button */}
@@ -95,7 +98,8 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
               onClick={handleLinkClick}
               className={cn(
                 "flex items-center gap-x-3 text-sm font-medium px-4 py-3 rounded-xl transition-all",
-                pathname === route.href
+                (route.href === "/dashboard" && isDashboardActive) ||
+                  (route.href !== "/dashboard" && pathname === route.href)
                   ? "bg-primary/10 text-primary shadow-sm"
                   : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 hover:shadow-sm"
               )}
@@ -103,7 +107,8 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
               <div
                 className={cn(
                   "flex items-center justify-center w-8 h-8 rounded-lg",
-                  pathname === route.href
+                  (route.href === "/dashboard" && isDashboardActive) ||
+                    (route.href !== "/dashboard" && pathname === route.href)
                     ? "bg-primary/10"
                     : "bg-zinc-100 dark:bg-zinc-800"
                 )}
