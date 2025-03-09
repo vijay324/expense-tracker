@@ -13,6 +13,7 @@ import { Overview } from "@/components/dashboard/overview";
 import { RecentTransactions } from "@/components/dashboard/transactions";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { toast } from "react-hot-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface DashboardData {
   totalIncome: number;
@@ -27,6 +28,9 @@ export function DashboardClient() {
     null
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
 
   useEffect(() => {
     // First, ensure the user exists in our database
@@ -209,31 +213,37 @@ export function DashboardClient() {
         </Card>
       </div>
 
-      {/* Rest of the dashboard content */}
-      <div className="grid gap-4 mt-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-            <CardDescription>
-              Monthly income and expenses for the current year
-            </CardDescription>
+      {/* Tabbed content for Overview and Recent Transactions */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <Tabs defaultValue="overview" className="w-full">
+              <div className="flex items-center justify-between">
+                <TabsList className="grid w-full max-w-md grid-cols-2">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="transactions">
+                    Recent Transactions
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="overview" className="mt-4">
+                <CardDescription className="mb-4">
+                  Monthly income and expenses for the current year
+                </CardDescription>
+                <Overview data={dashboardData?.monthlyData || []} />
+              </TabsContent>
+
+              <TabsContent value="transactions" className="mt-4">
+                <CardDescription className="mb-4">
+                  Your most recent income and expense entries
+                </CardDescription>
+                <RecentTransactions
+                  transactions={dashboardData?.recentTransactions || []}
+                />
+              </TabsContent>
+            </Tabs>
           </CardHeader>
-          <CardContent>
-            <Overview data={dashboardData?.monthlyData || []} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>
-              Your most recent income and expense entries
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentTransactions
-              transactions={dashboardData?.recentTransactions || []}
-            />
-          </CardContent>
         </Card>
       </div>
     </div>

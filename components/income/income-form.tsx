@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
 
 const formSchema = z.object({
   amount: z
@@ -63,19 +65,30 @@ export function IncomeForm({
   onSuccess,
   onCancel,
 }: IncomeFormProps = {}) {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    initialData?.date ? new Date(initialData.date) : new Date()
+  );
+
   const isEditing = !!initialData?.id;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      amount: "",
-      category: "",
-      description: "",
-      date: new Date().toISOString().split("T")[0],
+    defaultValues: {
+      amount: initialData?.amount || "",
+      category: initialData?.category || "",
+      description: initialData?.description || "",
+      date: initialData?.date || format(new Date(), "yyyy-MM-dd"),
     },
   });
+
+  // Update the form date field when selectedDate changes
+  useEffect(() => {
+    if (selectedDate) {
+      form.setValue("date", format(selectedDate, "yyyy-MM-dd"));
+    }
+  }, [selectedDate, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -180,7 +193,18 @@ export function IncomeForm({
               <FormItem>
                 <FormLabel>Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <div className="flex flex-col space-y-1">
+                    <DatePicker
+                      date={selectedDate}
+                      onChange={(date) => {
+                        setSelectedDate(date);
+                        if (date) {
+                          field.onChange(format(date, "yyyy-MM-dd"));
+                        }
+                      }}
+                    />
+                    <Input type="hidden" {...field} />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
