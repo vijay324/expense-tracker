@@ -7,6 +7,9 @@ import {
   DollarSign,
   PieChart,
   Shield,
+  IndianRupee,
+  TrendingDown,
+  BarChart,
 } from "lucide-react";
 
 export default async function LandingPage() {
@@ -23,24 +26,24 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <header className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Take Control of Your Finances
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              Manage Your Finances with Ease
             </h1>
-            <p className="text-xl mb-8">
-              Track expenses, set budgets, and achieve your financial goals with
-              our easy-to-use finance tracker.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8">
+              Track expenses, analyze spending patterns, and achieve your
+              financial goals with our intuitive expense tracking application.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/sign-up"
-                className="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-medium transition-colors"
+                className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               >
                 Get Started
               </Link>
               <Link
                 href="/sign-in"
-                className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               >
                 Sign In
               </Link>
@@ -55,46 +58,37 @@ export default async function LandingPage() {
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
             Powerful Features to Manage Your Money
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-              <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full w-fit mb-4">
-                <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+            <div className="flex flex-col items-center text-center p-6 bg-card rounded-lg shadow-sm border border-border">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <IndianRupee className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-                Expense Tracking
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Easily log and categorize your expenses to understand where your
-                money is going.
+              <h3 className="text-xl font-semibold mb-2">Income Tracking</h3>
+              <p className="text-muted-foreground">
+                Record and categorize all your income sources to get a complete
+                financial picture.
               </p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-              <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full w-fit mb-4">
-                <BarChart2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="flex flex-col items-center text-center p-6 bg-card rounded-lg shadow-sm border border-border">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <TrendingDown className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-                Budget Management
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Set budgets for different categories and receive alerts when
-                you're approaching your limits.
+              <h3 className="text-xl font-semibold mb-2">Expense Management</h3>
+              <p className="text-muted-foreground">
+                Track your expenses by categories and identify spending patterns
+                to optimize your finances.
               </p>
             </div>
 
-            {/* Feature 3 */}
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-              <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full w-fit mb-4">
-                <PieChart className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="flex flex-col items-center text-center p-6 bg-card rounded-lg shadow-sm border border-border">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <BarChart className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-                Insightful Reports
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Visualize your spending patterns with intuitive charts and
-                detailed reports.
+              <h3 className="text-xl font-semibold mb-2">Financial Reports</h3>
+              <p className="text-muted-foreground">
+                Get detailed reports and visualizations to understand your
+                financial health and make better decisions.
               </p>
             </div>
           </div>
