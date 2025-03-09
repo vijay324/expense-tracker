@@ -10,7 +10,6 @@ import {
 import { ExpensesTable } from "@/components/expenses/expenses-table";
 import { ExpenseCategories } from "@/components/expenses/expense-categories";
 import { ExpenseDialog } from "@/components/expenses/expense-dialog";
-import { BudgetAlert } from "@/components/expenses/budget-alert";
 
 interface Expense {
   id: string;
@@ -23,15 +22,9 @@ interface Expense {
 
 interface ExpensesClientProps {
   initialExpenses: Expense[];
-  initialBudgetAmount: number;
-  initialTotalExpenses: number;
 }
 
-export function ExpensesClient({
-  initialExpenses,
-  initialBudgetAmount,
-  initialTotalExpenses,
-}: ExpensesClientProps) {
+export function ExpensesClient({ initialExpenses }: ExpensesClientProps) {
   return (
     <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
       <div className="flex items-center justify-between">
@@ -45,12 +38,6 @@ export function ExpensesClient({
           className="ml-4"
         />
       </div>
-
-      {/* Budget Alert */}
-      <BudgetAlert
-        totalExpenses={initialTotalExpenses}
-        budgetAmount={initialBudgetAmount}
-      />
 
       {/* Expense Categories */}
       <Card className="overflow-hidden">

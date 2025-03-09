@@ -21,13 +21,23 @@ interface MonthlyData {
   expenses: number;
 }
 
-export function Overview() {
+interface OverviewProps {
+  data?: MonthlyData[];
+}
+
+export function Overview({ data: propData }: OverviewProps) {
   const [data, setData] = useState<MonthlyData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(propData ? false : true);
   const [chartType, setChartType] = useState<"bar" | "composed">("bar");
   const [viewMode, setViewMode] = useState<"all" | "current">("all");
 
   useEffect(() => {
+    if (propData && propData.length > 0) {
+      setData(propData);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         const response = await fetch("/api/dashboard");
@@ -56,7 +66,7 @@ export function Overview() {
     };
 
     fetchData();
-  }, []);
+  }, [propData]);
 
   // Filter data based on view mode
   const currentMonth = new Date().getMonth();

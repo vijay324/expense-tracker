@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   IndianRupee,
-  DollarSign,
   CreditCard,
   LayoutDashboard,
+  ChartNoAxesCombined,
   TrendingDown,
   PiggyBank,
   X,
@@ -39,10 +39,10 @@ const routes = [
     color: "text-rose-500",
   },
   {
-    label: "Budget",
-    icon: <PiggyBank className="h-5 w-5" />,
-    href: "/budget",
-    color: "text-violet-500",
+    label: "Reports",
+    icon: <ChartNoAxesCombined className="h-5 w-5" />,
+    href: "/reports",
+    color: "text-amber-500",
   },
 ];
 

@@ -25,13 +25,10 @@ import { RecentTransactions } from "@/components/dashboard/transactions";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { BudgetAlert } from "@/components/expenses/budget-alert";
 
 interface DashboardData {
   totalIncome: number;
   totalExpenses: number;
-  budgetAmount: number;
-  budgetRemaining: number;
   savingsRate: number;
   recentTransactions: any[];
   monthlyData: any[];
@@ -130,15 +127,8 @@ export default function DashboardPage() {
   // Default values if data is not available
   const totalIncome = dashboardData?.totalIncome || 0;
   const totalExpenses = dashboardData?.totalExpenses || 0;
-  const budgetAmount = dashboardData?.budgetAmount || 0;
-  const budgetRemaining = dashboardData?.budgetRemaining || 0;
   const savingsRate = dashboardData?.savingsRate || 0;
-
-  // Calculate percentage of budget used
-  const budgetPercentage =
-    budgetAmount > 0
-      ? Math.min(Math.round((totalExpenses / budgetAmount) * 100), 100)
-      : 0;
+  const netSavings = totalIncome - totalExpenses;
 
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-8">
@@ -162,10 +152,7 @@ export default function DashboardPage() {
         <QuickActions />
       </div>
 
-      {/* Budget Alert */}
-      <BudgetAlert totalExpenses={totalExpenses} budgetAmount={budgetAmount} />
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Total Income Card */}
         <Card className="overflow-hidden border-l-4 border-l-emerald-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
@@ -208,102 +195,60 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Budget Remaining Card */}
-        <Card className="overflow-hidden border-l-4 border-l-blue-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
-            <CardTitle className="text-sm font-medium">
-              Budget Remaining
-            </CardTitle>
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-              <PiggyBank className="h-4 w-4 text-blue-500" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="text-2xl font-bold">
-              ₹{budgetRemaining.toLocaleString()}
-            </div>
-            <div className="w-full mt-2">
-              <div className="flex justify-between text-xs mb-1">
-                <span>{budgetPercentage}% used</span>
-                <span>{100 - budgetPercentage}% left</span>
-              </div>
-              <div className="w-full bg-zinc-200 rounded-full h-2.5 dark:bg-zinc-700">
-                <div
-                  className={`h-2.5 rounded-full ${
-                    budgetPercentage > 90
-                      ? "bg-rose-500"
-                      : budgetPercentage > 70
-                      ? "bg-amber-500"
-                      : "bg-emerald-500"
-                  }`}
-                  style={{ width: `${budgetPercentage}%` }}
-                ></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Savings Rate Card */}
+        {/* Net Savings Card */}
         <Card className="overflow-hidden border-l-4 border-l-purple-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
-            <CardTitle className="text-sm font-medium">Savings Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Net Savings</CardTitle>
             <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-              <PieChart className="h-4 w-4 text-purple-500" />
+              <PiggyBank className="h-4 w-4 text-purple-500" />
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold">{savingsRate}%</div>
+            <div
+              className={`text-2xl font-bold ${
+                netSavings >= 0
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-rose-600 dark:text-rose-400"
+              }`}
+            >
+              ₹{netSavings.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {totalIncome > 0
-                ? "Of your income saved"
+                ? `Savings rate: ${savingsRate}%`
                 : "Add income to calculate savings"}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="mt-6">
-        <TabsList className="grid w-full grid-cols-2 md:w-auto">
-          <TabsTrigger value="overview" className="flex items-center">
-            <BarChart4 className="h-4 w-4 mr-2" />
-            <span>Overview</span>
-          </TabsTrigger>
-          <TabsTrigger value="transactions" className="flex items-center">
-            <CreditCard className="h-4 w-4 mr-2" />
-            <span>Transactions</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4 mt-4">
-          <Card className="col-span-full">
-            <CardHeader>
-              <CardTitle>Monthly Overview</CardTitle>
-              <CardDescription>
-                Your income and expenses for the current year
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <Overview />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="transactions" className="space-y-4 mt-4">
-          <Card className="col-span-full">
-            <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
-              <CardDescription>
-                {dashboardData?.recentTransactions?.length
-                  ? `You made ${dashboardData.recentTransactions.length} transactions recently`
-                  : "No recent transactions"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RecentTransactions />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Rest of the dashboard content */}
+      <div className="grid gap-4 mt-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-full lg:col-span-4">
+          <CardHeader>
+            <CardTitle>Overview</CardTitle>
+            <CardDescription>
+              Monthly income and expenses for the current year
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Overview data={dashboardData?.monthlyData || []} />
+          </CardContent>
+        </Card>
+        <Card className="col-span-full lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Recent Transactions</CardTitle>
+            <CardDescription>
+              Your most recent income and expense entries
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecentTransactions
+              transactions={dashboardData?.recentTransactions || []}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

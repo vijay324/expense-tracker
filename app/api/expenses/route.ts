@@ -15,12 +15,13 @@ interface Expense {
 }
 
 // Get all expense entries for the current user
-export const GET: Handler<Expense[]> = async (req) => {
+export async function GET(request: Request) {
   try {
     const { userId } = await auth();
-
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     // Get the user from our database
@@ -31,25 +32,56 @@ export const GET: Handler<Expense[]> = async (req) => {
     });
 
     if (!user) {
-      return new NextResponse("User not found", { status: 404 });
+      return new NextResponse(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+      });
     }
 
-    // Get all expense entries for the user
-    const expenses = await prisma.expense.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        date: "desc",
-      },
-    });
+    // Get the year from the query params
+    const { searchParams } = new URL(request.url);
+    const yearParam = searchParams.get("year");
+
+    // Get expense entries based on filters
+    let expenses;
+
+    if (yearParam) {
+      // If year is specified, filter by year
+      const year = parseInt(yearParam);
+      expenses = await prisma.expense.findMany({
+        where: {
+          userId: user.id,
+          date: {
+            gte: new Date(`${year}-01-01T00:00:00.000Z`),
+            lt: new Date(`${year + 1}-01-01T00:00:00.000Z`),
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+    } else {
+      // If no year specified, get all expense entries
+      expenses = await prisma.expense.findMany({
+        where: {
+          userId: user.id,
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+    }
 
     return NextResponse.json(expenses);
   } catch (error) {
-    console.error("[EXPENSE_GET]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error fetching expenses:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }),
+      {
+        status: 500,
+      }
+    );
   }
-};
+}
 
 // Create a new expense entry
 export const POST: Handler<Expense> = async (req) => {

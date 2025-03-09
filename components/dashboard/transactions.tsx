@@ -15,11 +15,25 @@ interface Transaction {
   type: string;
 }
 
-export function RecentTransactions() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface RecentTransactionsProps {
+  transactions?: Transaction[];
+}
+
+export function RecentTransactions({
+  transactions: propTransactions,
+}: RecentTransactionsProps) {
+  const [transactions, setTransactions] = useState<Transaction[]>(
+    propTransactions || []
+  );
+  const [isLoading, setIsLoading] = useState(propTransactions ? false : true);
 
   useEffect(() => {
+    if (propTransactions && propTransactions.length > 0) {
+      setTransactions(propTransactions);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchTransactions = async () => {
       try {
         const response = await fetch("/api/dashboard");
@@ -38,7 +52,7 @@ export function RecentTransactions() {
     };
 
     fetchTransactions();
-  }, []);
+  }, [propTransactions]);
 
   if (isLoading) {
     return (

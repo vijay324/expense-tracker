@@ -15,12 +15,13 @@ interface Income {
 }
 
 // Get all income entries for the current user
-export const GET: Handler<Income[]> = async (req) => {
+export async function GET(request: Request) {
   try {
     const { userId } = await auth();
-
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     // Get the user from our database
@@ -31,25 +32,56 @@ export const GET: Handler<Income[]> = async (req) => {
     });
 
     if (!user) {
-      return new NextResponse("User not found", { status: 404 });
+      return new NextResponse(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+      });
     }
 
-    // Get all income entries for the user
-    const incomes = await prisma.income.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        date: "desc",
-      },
-    });
+    // Get the year from the query params
+    const { searchParams } = new URL(request.url);
+    const yearParam = searchParams.get("year");
+
+    // Get income entries based on filters
+    let incomes;
+
+    if (yearParam) {
+      // If year is specified, filter by year
+      const year = parseInt(yearParam);
+      incomes = await prisma.income.findMany({
+        where: {
+          userId: user.id,
+          date: {
+            gte: new Date(`${year}-01-01T00:00:00.000Z`),
+            lt: new Date(`${year + 1}-01-01T00:00:00.000Z`),
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+    } else {
+      // If no year specified, get all income entries
+      incomes = await prisma.income.findMany({
+        where: {
+          userId: user.id,
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+    }
 
     return NextResponse.json(incomes);
   } catch (error) {
-    console.error("[INCOME_GET]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error fetching income:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }),
+      {
+        status: 500,
+      }
+    );
   }
-};
+}
 
 // Create a new income entry
 export const POST: Handler<Income> = async (req) => {

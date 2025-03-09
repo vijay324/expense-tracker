@@ -16,8 +16,6 @@ interface Transaction {
 interface DashboardData {
   totalIncome: number;
   totalExpenses: number;
-  budgetAmount: number;
-  budgetRemaining: number;
   savingsRate: number;
   recentTransactions: Transaction[];
   monthlyData: Array<{
@@ -48,8 +46,6 @@ export const GET: Handler<DashboardData> = async (req) => {
       return NextResponse.json({
         totalIncome: 0,
         totalExpenses: 0,
-        budgetAmount: 0,
-        budgetRemaining: 0,
         savingsRate: 0,
         recentTransactions: [],
         monthlyData: [],
@@ -84,14 +80,6 @@ export const GET: Handler<DashboardData> = async (req) => {
       },
       _sum: {
         amount: true,
-      },
-    });
-
-    // Get current year's budget
-    const budget = await prisma.budget.findFirst({
-      where: {
-        userId: user.id,
-        year: currentYear,
       },
     });
 
@@ -223,13 +211,11 @@ export const GET: Handler<DashboardData> = async (req) => {
       })
     );
 
-    // Calculate budget remaining
-    const budgetAmount = budget?.amount || 0;
+    // Calculate values
+    const incomeAmount = totalIncome._sum.amount || 0;
     const expensesAmount = totalExpenses._sum.amount || 0;
-    const budgetRemaining = budgetAmount - expensesAmount;
 
     // Calculate savings rate
-    const incomeAmount = totalIncome._sum.amount || 0;
     const savingsRate =
       incomeAmount > 0
         ? Math.round(((incomeAmount - expensesAmount) / incomeAmount) * 100)
@@ -238,8 +224,6 @@ export const GET: Handler<DashboardData> = async (req) => {
     return NextResponse.json({
       totalIncome: incomeAmount,
       totalExpenses: expensesAmount,
-      budgetAmount,
-      budgetRemaining,
       savingsRate,
       recentTransactions,
       monthlyData,
