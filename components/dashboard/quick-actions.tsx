@@ -21,7 +21,7 @@ export function QuickActions() {
         <div className="flex flex-col sm:flex-row gap-3">
           <ExpenseDialog
             buttonVariant="default"
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto mx-2"
             onSuccess={handleSuccess}
           />
           <IncomeDialog

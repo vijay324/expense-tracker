@@ -56,7 +56,7 @@ export function DashboardClient() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 p-4 md:p-6 lg:p-8">
+      <div className="flex-1">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
             Dashboard
@@ -118,7 +118,7 @@ export function DashboardClient() {
   const netSavings = totalIncome - totalExpenses;
 
   return (
-    <div className="flex-1 p-4 md:p-6 lg:p-8">
+    <div className="flex-1">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2 sm:mb-0">
           Dashboard

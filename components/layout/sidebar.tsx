@@ -101,7 +101,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
                 (route.href === "/dashboard" && isDashboardActive) ||
                   (route.href !== "/dashboard" && pathname === route.href)
                   ? "bg-primary/10 text-primary shadow-sm"
-                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 hover:shadow-sm"
+                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 hover:shadow-sm"
               )}
             >
               <div
@@ -110,7 +110,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
                   (route.href === "/dashboard" && isDashboardActive) ||
                     (route.href !== "/dashboard" && pathname === route.href)
                     ? "bg-primary/10"
-                    : "bg-zinc-100 dark:bg-zinc-800"
+                    : "bg-zinc-100/30 dark:bg-zinc-800"
                 )}
               >
                 <div className={cn("shrink-0", route.color)}>{route.icon}</div>

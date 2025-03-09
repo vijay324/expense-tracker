@@ -307,7 +307,7 @@ function ReportsClientContent({
         );
 
   return (
-    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl pt-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Financial Reports
@@ -836,7 +836,7 @@ export function ReportsClient(props: ReportsClientProps) {
 // Loading skeleton component
 function ReportsLoadingSkeleton() {
   return (
-    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl pt-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <Skeleton className="h-10 w-64" />
         <Skeleton className="h-10 w-40" />

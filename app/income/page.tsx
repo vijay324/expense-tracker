@@ -53,7 +53,7 @@ export default async function IncomePage() {
   const incomes = await getIncomes();
 
   return (
-    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl">
+    <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl pt-8">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Income
