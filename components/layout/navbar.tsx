@@ -60,14 +60,14 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className="h-9 w-9 rounded-full bg-zinc-100/40 dark:bg-zinc-900/80 shadow-sm"
+              className="h-9 w-9 rounded-full hover:shadow-sm"
             >
               <Menu className="h-4 w-4" />
             </Button>
           )}
 
           {/* Theme toggle */}
-          <div className=" rounded-full bg-zinc-100/40 dark:bg-zinc-900/80 shadow-sm">
+          <div className=" rounded-full hover:shadow-sm">
             <ModeToggle />
           </div>
 
@@ -77,7 +77,7 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
             appearance={{
               elements: {
                 userButtonAvatarBox:
-                  "h-9 w-9 border-2 border-white dark:border-zinc-900 shadow-sm hover:shadow-md transition-shadow rounded-full",
+                  "h-11 w-11 border-2 border-white dark:border-zinc-900 shadow-sm hover:shadow-md transition-shadow rounded-full",
               },
             }}
           />

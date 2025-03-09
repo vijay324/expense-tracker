@@ -40,7 +40,7 @@ const routes = [
   },
   {
     label: "Reports",
-    icon: <CreditCard className="h-5 w-5" />,
+    icon: <ChartNoAxesCombined className="h-5 w-5" />,
     href: "/reports",
     color: "text-amber-500",
   },
