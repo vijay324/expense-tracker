@@ -104,6 +104,12 @@ function ReportsClientContent({
   const [selectedYear, setSelectedYear] = useState<number>(defaultYear);
   const [incomeData, setIncomeData] = useState<Income[]>([]);
   const [expenseData, setExpenseData] = useState<Expense[]>([]);
+  const [previousYearIncomeData, setPreviousYearIncomeData] = useState<
+    Income[]
+  >([]);
+  const [previousYearExpenseData, setPreviousYearExpenseData] = useState<
+    Expense[]
+  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("overview");
 
@@ -121,6 +127,27 @@ function ReportsClientContent({
         const expenseRes = await fetch(`/api/expenses?year=${selectedYear}`);
         const expenseJson = await expenseRes.json();
         setExpenseData(expenseJson);
+
+        // Fetch data for the previous year if it exists
+        if (yearsWithData.includes(selectedYear - 1)) {
+          // Fetch previous year income data
+          const prevYearIncomeRes = await fetch(
+            `/api/income?year=${selectedYear - 1}`
+          );
+          const prevYearIncomeJson = await prevYearIncomeRes.json();
+          setPreviousYearIncomeData(prevYearIncomeJson);
+
+          // Fetch previous year expense data
+          const prevYearExpenseRes = await fetch(
+            `/api/expenses?year=${selectedYear - 1}`
+          );
+          const prevYearExpenseJson = await prevYearExpenseRes.json();
+          setPreviousYearExpenseData(prevYearExpenseJson);
+        } else {
+          // Reset previous year data if no data exists
+          setPreviousYearIncomeData([]);
+          setPreviousYearExpenseData([]);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -203,27 +230,73 @@ function ReportsClientContent({
   incomeByCategory.sort((a, b) => b.value - a.value);
   expensesByCategory.sort((a, b) => b.value - a.value);
 
-  // Calculate totals
+  // Calculate totals for current year
   const totalIncome = incomeData.reduce((sum, item) => sum + item.amount, 0);
   const totalExpenses = expenseData.reduce((sum, item) => sum + item.amount, 0);
   const netSavings = totalIncome - totalExpenses;
+
+  // Calculate totals for previous year
+  const previousYearIncome = previousYearIncomeData.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+  const previousYearExpenses = previousYearExpenseData.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
 
   // Find highest income and expense
   const highestIncome = incomeByCategory[0] || { name: "None", value: 0 };
   const highestExpense = expensesByCategory[0] || { name: "None", value: 0 };
 
   // Calculate comparison with previous month
-  const currentMonth = new Date().getMonth();
-  const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-  const previousMonthYear =
-    currentMonth === 0 ? selectedYear - 1 : selectedYear;
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
 
-  // Current month data
+  // Determine if we're comparing within the selected year or need to look at previous/next years
+  const isSelectedYearCurrent = selectedYear === currentYear;
+
+  // For monthly comparison, we'll use the current month and previous month if we're in the selected year
+  // Otherwise, we'll compare December with November of the selected year
+  const comparisonCurrentMonth = isSelectedYearCurrent ? currentMonth : 11; // December
+  const comparisonPreviousMonth = isSelectedYearCurrent
+    ? currentMonth === 0
+      ? 11
+      : currentMonth - 1
+    : 10; // Previous month or November
+
+  // Determine the year for the previous month (might be previous year if current month is January)
+  const comparisonPreviousMonthYear =
+    isSelectedYearCurrent && currentMonth === 0
+      ? selectedYear - 1
+      : selectedYear;
+
+  // Get month names for display
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const currentMonthName = monthNames[comparisonCurrentMonth];
+  const previousMonthName = monthNames[comparisonPreviousMonth];
+
+  // Current month data (either current month of current year, or December of selected year)
   const currentMonthIncome = incomeData
     .filter((income) => {
       const date = new Date(income.date);
       return (
-        date.getMonth() === currentMonth && date.getFullYear() === selectedYear
+        date.getMonth() === comparisonCurrentMonth &&
+        date.getFullYear() === selectedYear
       );
     })
     .reduce((sum, item) => sum + item.amount, 0);
@@ -232,7 +305,8 @@ function ReportsClientContent({
     .filter((expense) => {
       const date = new Date(expense.date);
       return (
-        date.getMonth() === currentMonth && date.getFullYear() === selectedYear
+        date.getMonth() === comparisonCurrentMonth &&
+        date.getFullYear() === selectedYear
       );
     })
     .reduce((sum, item) => sum + item.amount, 0);
@@ -242,8 +316,8 @@ function ReportsClientContent({
     .filter((income) => {
       const date = new Date(income.date);
       return (
-        date.getMonth() === previousMonth &&
-        date.getFullYear() === previousMonthYear
+        date.getMonth() === comparisonPreviousMonth &&
+        date.getFullYear() === comparisonPreviousMonthYear
       );
     })
     .reduce((sum, item) => sum + item.amount, 0);
@@ -252,59 +326,88 @@ function ReportsClientContent({
     .filter((expense) => {
       const date = new Date(expense.date);
       return (
-        date.getMonth() === previousMonth &&
-        date.getFullYear() === previousMonthYear
+        date.getMonth() === comparisonPreviousMonth &&
+        date.getFullYear() === comparisonPreviousMonthYear
       );
     })
     .reduce((sum, item) => sum + item.amount, 0);
 
-  // Calculate percentage changes
-  const incomeMonthlyChange =
-    previousMonthIncome === 0
-      ? 100
-      : Math.round(
-          ((currentMonthIncome - previousMonthIncome) / previousMonthIncome) *
-            100
-        );
+  // Helper function to calculate percentage change
+  const calculatePercentageChange = (
+    current: number,
+    previous: number
+  ): number => {
+    if (previous === 0) {
+      return current > 0 ? 100 : 0;
+    }
+    return Math.round(((current - previous) / previous) * 100);
+  };
 
-  const expensesMonthlyChange =
-    previousMonthExpenses === 0
-      ? 100
-      : Math.round(
-          ((currentMonthExpenses - previousMonthExpenses) /
-            previousMonthExpenses) *
-            100
-        );
+  // Calculate percentage changes with better handling of edge cases
+  const incomeMonthlyChange = calculatePercentageChange(
+    currentMonthIncome,
+    previousMonthIncome
+  );
+  const expensesMonthlyChange = calculatePercentageChange(
+    currentMonthExpenses,
+    previousMonthExpenses
+  );
 
-  // Calculate comparison with previous year
-  const previousYearIncome = incomeData
-    .filter((income) => {
+  // Calculate percentage changes with better handling of edge cases
+  const incomeYearlyChange = calculatePercentageChange(
+    totalIncome,
+    previousYearIncome
+  );
+  const expensesYearlyChange = calculatePercentageChange(
+    totalExpenses,
+    previousYearExpenses
+  );
+
+  // Determine if we have data for the previous year
+  const hasPreviousYearData = yearsWithData.includes(selectedYear - 1);
+
+  // Determine if we have data for the current and previous months
+  const hasCurrentMonthData =
+    incomeData.some((income) => {
       const date = new Date(income.date);
-      return date.getFullYear() === selectedYear - 1;
-    })
-    .reduce((sum, item) => sum + item.amount, 0);
-
-  const previousYearExpenses = expenseData
-    .filter((expense) => {
+      return (
+        date.getMonth() === comparisonCurrentMonth &&
+        date.getFullYear() === selectedYear
+      );
+    }) ||
+    expenseData.some((expense) => {
       const date = new Date(expense.date);
-      return date.getFullYear() === selectedYear - 1;
-    })
-    .reduce((sum, item) => sum + item.amount, 0);
+      return (
+        date.getMonth() === comparisonCurrentMonth &&
+        date.getFullYear() === selectedYear
+      );
+    });
 
-  // Calculate percentage changes
-  const incomeYearlyChange =
-    previousYearIncome === 0
-      ? 100
-      : Math.round(
-          ((totalIncome - previousYearIncome) / previousYearIncome) * 100
-        );
+  const hasPreviousMonthData =
+    incomeData.some((income) => {
+      const date = new Date(income.date);
+      return (
+        date.getMonth() === comparisonPreviousMonth &&
+        date.getFullYear() === comparisonPreviousMonthYear
+      );
+    }) ||
+    expenseData.some((expense) => {
+      const date = new Date(expense.date);
+      return (
+        date.getMonth() === comparisonPreviousMonth &&
+        date.getFullYear() === comparisonPreviousMonthYear
+      );
+    });
 
-  const expensesYearlyChange =
-    previousYearExpenses === 0
-      ? 100
-      : Math.round(
-          ((totalExpenses - previousYearExpenses) / previousYearExpenses) * 100
-        );
+  const hasMonthlyComparisonData = hasCurrentMonthData && hasPreviousMonthData;
+
+  // Check if we actually have income or expense data for the previous year
+  const hasPreviousYearIncomeData = previousYearIncomeData.length > 0;
+  const hasPreviousYearExpenseData = previousYearExpenseData.length > 0;
+
+  const hasYearlyComparisonData =
+    (incomeData.length > 0 || expenseData.length > 0) &&
+    (hasPreviousYearIncomeData || hasPreviousYearExpenseData);
 
   return (
     <div className="flex-1 space-y-6 container mx-auto px-4 max-w-7xl pt-8">
@@ -492,7 +595,13 @@ function ReportsClientContent({
             <CardHeader>
               <CardTitle>Period Comparison</CardTitle>
               <CardDescription>
-                Compare with previous month and year
+                {isSelectedYearCurrent
+                  ? `Compare current month (${currentMonthName}) with previous month (${previousMonthName}) and ${selectedYear} with ${
+                      selectedYear - 1
+                    }`
+                  : `Compare ${currentMonthName} with ${previousMonthName} and ${selectedYear} with ${
+                      selectedYear - 1
+                    }`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -509,120 +618,153 @@ function ReportsClientContent({
                     <h3 className="text-base font-medium mb-3">
                       Monthly Comparison
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-lg border bg-card">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium">Income</span>
-                          <div
-                            className={`text-xs font-medium px-2 py-1 rounded-full ${
-                              incomeMonthlyChange > 0
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                : incomeMonthlyChange < 0
-                                ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
-                                : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                            }`}
-                          >
-                            {incomeMonthlyChange > 0 ? "+" : ""}
-                            {incomeMonthlyChange}%
+                    {!hasMonthlyComparisonData ? (
+                      <div className="text-sm text-muted-foreground p-4 rounded-lg border bg-card">
+                        {!hasCurrentMonthData && !hasPreviousMonthData
+                          ? `No data available for ${currentMonthName} or ${previousMonthName}.`
+                          : !hasCurrentMonthData
+                          ? `No data available for ${currentMonthName} to compare with ${previousMonthName}.`
+                          : `No data available for ${previousMonthName} to compare with ${currentMonthName}.`}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-lg border bg-card">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium">Income</span>
+                            <div
+                              className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                incomeMonthlyChange > 0
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                  : incomeMonthlyChange < 0
+                                  ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                  : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                              }`}
+                            >
+                              {incomeMonthlyChange > 0 ? "+" : ""}
+                              {incomeMonthlyChange}%
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>
+                              {currentMonthName}: ₹
+                              {currentMonthIncome.toLocaleString()}
+                            </span>
+                            <span>
+                              {previousMonthName}: ₹
+                              {previousMonthIncome.toLocaleString()}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>
-                            Current: ₹{currentMonthIncome.toLocaleString()}
-                          </span>
-                          <span>
-                            Previous: ₹{previousMonthIncome.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
 
-                      <div className="p-4 rounded-lg border bg-card">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium">Expenses</span>
-                          <div
-                            className={`text-xs font-medium px-2 py-1 rounded-full ${
-                              expensesMonthlyChange < 0
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                : expensesMonthlyChange > 0
-                                ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
-                                : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                            }`}
-                          >
-                            {expensesMonthlyChange > 0 ? "+" : ""}
-                            {expensesMonthlyChange}%
+                        <div className="p-4 rounded-lg border bg-card">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium">
+                              Expenses
+                            </span>
+                            <div
+                              className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                expensesMonthlyChange < 0
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                  : expensesMonthlyChange > 0
+                                  ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                  : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                              }`}
+                            >
+                              {expensesMonthlyChange > 0 ? "+" : ""}
+                              {expensesMonthlyChange}%
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>
+                              {currentMonthName}: ₹
+                              {currentMonthExpenses.toLocaleString()}
+                            </span>
+                            <span>
+                              {previousMonthName}: ₹
+                              {previousMonthExpenses.toLocaleString()}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>
-                            Current: ₹{currentMonthExpenses.toLocaleString()}
-                          </span>
-                          <span>
-                            Previous: ₹{previousMonthExpenses.toLocaleString()}
-                          </span>
-                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   <div>
                     <h3 className="text-base font-medium mb-3">
                       Yearly Comparison
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-lg border bg-card">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium">Income</span>
-                          <div
-                            className={`text-xs font-medium px-2 py-1 rounded-full ${
-                              incomeYearlyChange > 0
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                : incomeYearlyChange < 0
-                                ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
-                                : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                            }`}
-                          >
-                            {incomeYearlyChange > 0 ? "+" : ""}
-                            {incomeYearlyChange}%
+                    {!hasYearlyComparisonData ? (
+                      <div className="text-sm text-muted-foreground p-4 rounded-lg border bg-card">
+                        {!hasPreviousYearData
+                          ? `No data available for ${
+                              selectedYear - 1
+                            } to compare with ${selectedYear}.`
+                          : !hasPreviousYearIncomeData &&
+                            !hasPreviousYearExpenseData
+                          ? `No data available for ${
+                              selectedYear - 1
+                            } to compare with ${selectedYear}.`
+                          : `No data available for comparison.`}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-lg border bg-card">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium">Income</span>
+                            <div
+                              className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                incomeYearlyChange > 0
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                  : incomeYearlyChange < 0
+                                  ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                  : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                              }`}
+                            >
+                              {incomeYearlyChange > 0 ? "+" : ""}
+                              {incomeYearlyChange}%
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>
+                              {selectedYear}: ₹{totalIncome.toLocaleString()}
+                            </span>
+                            <span>
+                              {selectedYear - 1}: ₹
+                              {previousYearIncome.toLocaleString()}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>
-                            {selectedYear}: ₹{totalIncome.toLocaleString()}
-                          </span>
-                          <span>
-                            {selectedYear - 1}: ₹
-                            {previousYearIncome.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
 
-                      <div className="p-4 rounded-lg border bg-card">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium">Expenses</span>
-                          <div
-                            className={`text-xs font-medium px-2 py-1 rounded-full ${
-                              expensesYearlyChange < 0
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                : expensesYearlyChange > 0
-                                ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
-                                : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                            }`}
-                          >
-                            {expensesYearlyChange > 0 ? "+" : ""}
-                            {expensesYearlyChange}%
+                        <div className="p-4 rounded-lg border bg-card">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium">
+                              Expenses
+                            </span>
+                            <div
+                              className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                expensesYearlyChange < 0
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                  : expensesYearlyChange > 0
+                                  ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                  : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                              }`}
+                            >
+                              {expensesYearlyChange > 0 ? "+" : ""}
+                              {expensesYearlyChange}%
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>
+                              {selectedYear}: ₹{totalExpenses.toLocaleString()}
+                            </span>
+                            <span>
+                              {selectedYear - 1}: ₹
+                              {previousYearExpenses.toLocaleString()}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>
-                            {selectedYear}: ₹{totalExpenses.toLocaleString()}
-                          </span>
-                          <span>
-                            {selectedYear - 1}: ₹
-                            {previousYearExpenses.toLocaleString()}
-                          </span>
-                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}

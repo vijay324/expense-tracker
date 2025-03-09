@@ -8,7 +8,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Briefcase, DollarSign, Code, Youtube } from "lucide-react";
+import {
+  Briefcase,
+  DollarSign,
+  Code,
+  TrendingUp,
+  Building,
+  Award,
+  Lightbulb,
+  Home,
+  Coins,
+  FileText,
+  Landmark,
+  PiggyBank,
+  Gift,
+  Wallet,
+} from "lucide-react";
 import {
   getIncomeCategoryBorderColor,
   getIncomeCategoryBgColor,
@@ -29,14 +44,41 @@ const getCategoryIcon = (category: string) => {
   const textColorClass = getIncomeCategoryTextColor(category);
 
   switch (category) {
+    case "Salary":
+      return <Briefcase className={`h-5 w-5 ${textColorClass}`} />;
+    case "Business":
+      return <Building className={`h-5 w-5 ${textColorClass}`} />;
+    case "Freelance":
+      return <Code className={`h-5 w-5 ${textColorClass}`} />;
+    case "Investment":
+      return <TrendingUp className={`h-5 w-5 ${textColorClass}`} />;
+    case "Bonus":
+      return <Award className={`h-5 w-5 ${textColorClass}`} />;
+    case "Side Hustle":
+      return <Lightbulb className={`h-5 w-5 ${textColorClass}`} />;
+    case "Rental Income":
+      return <Home className={`h-5 w-5 ${textColorClass}`} />;
+    case "Dividends":
+      return <Coins className={`h-5 w-5 ${textColorClass}`} />;
+    case "Tax Refund":
+      return <FileText className={`h-5 w-5 ${textColorClass}`} />;
+    case "Government Benefits":
+      return <Landmark className={`h-5 w-5 ${textColorClass}`} />;
+    case "Pension":
+      return <PiggyBank className={`h-5 w-5 ${textColorClass}`} />;
+    case "Gift":
+      return <Gift className={`h-5 w-5 ${textColorClass}`} />;
+    case "Inheritance":
+      return <Wallet className={`h-5 w-5 ${textColorClass}`} />;
+    // Include these for backward compatibility
     case "Job":
       return <Briefcase className={`h-5 w-5 ${textColorClass}`} />;
     case "Startup":
-      return <DollarSign className={`h-5 w-5 ${textColorClass}`} />;
-    case "Freelance":
-      return <Code className={`h-5 w-5 ${textColorClass}`} />;
+      return <Building className={`h-5 w-5 ${textColorClass}`} />;
     case "Social Media":
-      return <Youtube className={`h-5 w-5 ${textColorClass}`} />;
+      return <Lightbulb className={`h-5 w-5 ${textColorClass}`} />;
+    case "Other":
+      return <DollarSign className={`h-5 w-5 ${textColorClass}`} />;
     default:
       return <DollarSign className={`h-5 w-5 ${textColorClass}`} />;
   }

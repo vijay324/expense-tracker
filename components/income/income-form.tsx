@@ -161,10 +161,24 @@ export function IncomeForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Startup">Startup</SelectItem>
-                    <SelectItem value="Job">Job</SelectItem>
+                    <SelectItem value="Salary">Salary & Job</SelectItem>
+                    <SelectItem value="Business">
+                      Business & Start-UP
+                    </SelectItem>
                     <SelectItem value="Freelance">Freelance</SelectItem>
-                    <SelectItem value="Social Media">Social Media</SelectItem>
+                    <SelectItem value="Investment">Investment</SelectItem>
+                    <SelectItem value="Bonus">Bonus</SelectItem>
+                    <SelectItem value="Side Hustle">Side Hustle</SelectItem>
+                    <SelectItem value="Rental Income">Rental Income</SelectItem>
+                    <SelectItem value="Dividends">Dividends</SelectItem>
+                    <SelectItem value="Tax Refund">Tax Refund</SelectItem>
+                    <SelectItem value="Government Benefits">
+                      Government Benefits
+                    </SelectItem>
+                    <SelectItem value="Pension">Pension</SelectItem>
+                    <SelectItem value="Gift">Gift</SelectItem>
+                    <SelectItem value="Inheritance">Inheritance</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

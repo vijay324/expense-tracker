@@ -95,7 +95,7 @@ export const GET: Handler<DashboardData> = async (req) => {
         orderBy: {
           date: "desc",
         },
-        take: 5,
+        take: 10,
         select: {
           id: true,
           amount: true,
@@ -120,7 +120,7 @@ export const GET: Handler<DashboardData> = async (req) => {
         orderBy: {
           date: "desc",
         },
-        take: 5,
+        take: 10,
         select: {
           id: true,
           amount: true,
@@ -140,7 +140,7 @@ export const GET: Handler<DashboardData> = async (req) => {
     // Combine and sort recent transactions
     const recentTransactions = [...recentIncomes, ...recentExpenses]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
+      .slice(0, 10);
 
     // Get monthly data for the chart
     const months = [

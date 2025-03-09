@@ -15,6 +15,23 @@ import {
   Plane,
   Coffee,
   Dumbbell,
+  Home,
+  Utensils,
+  ShoppingBag,
+  Car,
+  Plug,
+  Heart,
+  Shield,
+  DollarSign,
+  Tv,
+  Calendar,
+  Scissors,
+  Gift,
+  Baby,
+  Hammer,
+  Shirt,
+  Landmark,
+  Briefcase,
 } from "lucide-react";
 import {
   getExpenseCategoryBorderColor,
@@ -36,18 +53,56 @@ const getCategoryIcon = (category: string) => {
   const textColorClass = getExpenseCategoryTextColor(category);
 
   switch (category) {
+    case "Housing":
+      return <Home className={`h-5 w-5 ${textColorClass}`} />;
+    case "Food":
+      return <Utensils className={`h-5 w-5 ${textColorClass}`} />;
+    case "Groceries":
+      return <ShoppingBag className={`h-5 w-5 ${textColorClass}`} />;
+    case "Restaurant & Dining Out":
+      return <Utensils className={`h-5 w-5 ${textColorClass}`} />;
+    case "Transportation":
+      return <Car className={`h-5 w-5 ${textColorClass}`} />;
+    case "Utilities":
+      return <Plug className={`h-5 w-5 ${textColorClass}`} />;
     case "Bills & Recharge":
       return <CreditCard className={`h-5 w-5 ${textColorClass}`} />;
-    case "Traveling":
-      return <Plane className={`h-5 w-5 ${textColorClass}`} />;
+    case "Healthcare":
+      return <Heart className={`h-5 w-5 ${textColorClass}`} />;
+    case "Insurance":
+      return <Shield className={`h-5 w-5 ${textColorClass}`} />;
+    case "Debt Payments":
+      return <DollarSign className={`h-5 w-5 ${textColorClass}`} />;
     case "Entertainment":
-      return <Coffee className={`h-5 w-5 ${textColorClass}`} />;
-    case "Education & Courses":
+      return <Tv className={`h-5 w-5 ${textColorClass}`} />;
+    case "Shopping":
+      return <ShoppingCart className={`h-5 w-5 ${textColorClass}`} />;
+    case "Subscriptions":
+      return <Calendar className={`h-5 w-5 ${textColorClass}`} />;
+    case "Education":
       return <BookOpen className={`h-5 w-5 ${textColorClass}`} />;
+    case "Personal Care":
+      return <Scissors className={`h-5 w-5 ${textColorClass}`} />;
+    case "Travel":
+      return <Plane className={`h-5 w-5 ${textColorClass}`} />;
+    case "Gifts & Donations":
+      return <Gift className={`h-5 w-5 ${textColorClass}`} />;
+    case "Childcare":
+      return <Baby className={`h-5 w-5 ${textColorClass}`} />;
+    case "Home Maintenance":
+      return <Hammer className={`h-5 w-5 ${textColorClass}`} />;
+    case "Clothing":
+      return <Shirt className={`h-5 w-5 ${textColorClass}`} />;
+    case "Taxes":
+      return <Landmark className={`h-5 w-5 ${textColorClass}`} />;
     case "Health & Fitness":
       return <Dumbbell className={`h-5 w-5 ${textColorClass}`} />;
+    case "Education & Courses":
+      return <BookOpen className={`h-5 w-5 ${textColorClass}`} />;
+    case "Traveling":
+      return <Plane className={`h-5 w-5 ${textColorClass}`} />;
     default:
-      return <ShoppingCart className={`h-5 w-5 ${textColorClass}`} />;
+      return <Briefcase className={`h-5 w-5 ${textColorClass}`} />;
   }
 };
 

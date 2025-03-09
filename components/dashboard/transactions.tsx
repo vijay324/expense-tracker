@@ -1,10 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { TrendingUp, TrendingDown, Calendar } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
+import {
+  getIncomeCategoryBgColor,
+  getIncomeCategoryTextColor,
+  getExpenseCategoryBgColor,
+  getExpenseCategoryTextColor,
+  getIncomeCategoryBorderColor,
+  getExpenseCategoryBorderColor,
+} from "@/lib/category-colors";
 
 interface Transaction {
   id: string;
@@ -13,14 +21,17 @@ interface Transaction {
   description: string | null;
   date: string;
   type: string;
+  createdAt?: string;
 }
 
 interface RecentTransactionsProps {
   transactions?: Transaction[];
+  limit?: number;
 }
 
 export function RecentTransactions({
   transactions: propTransactions,
+  limit = 10,
 }: RecentTransactionsProps) {
   const [transactions, setTransactions] = useState<Transaction[]>(
     propTransactions || []
@@ -29,7 +40,17 @@ export function RecentTransactions({
 
   useEffect(() => {
     if (propTransactions && propTransactions.length > 0) {
-      setTransactions(propTransactions);
+      // Sort by createdAt or date (newest first) and limit to specified number
+      const sortedTransactions = [...propTransactions]
+        .sort((a, b) => {
+          // Use createdAt if available, otherwise use date
+          const dateA = a.createdAt ? new Date(a.createdAt) : new Date(a.date);
+          const dateB = b.createdAt ? new Date(b.createdAt) : new Date(b.date);
+          return dateB.getTime() - dateA.getTime();
+        })
+        .slice(0, limit);
+
+      setTransactions(sortedTransactions);
       setIsLoading(false);
       return;
     }
@@ -40,7 +61,24 @@ export function RecentTransactions({
         if (response.ok) {
           const data = await response.json();
           if (data.recentTransactions && data.recentTransactions.length > 0) {
-            setTransactions(data.recentTransactions);
+            // Sort by createdAt or date (newest first) and limit to specified number
+            const sortedTransactions = [...data.recentTransactions]
+              .sort((a, b) => {
+                // Use createdAt if available, otherwise use date
+                const dateA = a.createdAt
+                  ? new Date(a.createdAt)
+                  : new Date(a.date);
+                const dateB = b.createdAt
+                  ? new Date(b.createdAt)
+                  : new Date(b.date);
+                return dateB.getTime() - dateA.getTime();
+              })
+              .slice(0, limit); // Ensure we only take the specified limit
+
+            console.log(
+              `Fetched ${data.recentTransactions.length} transactions, showing ${sortedTransactions.length}`
+            );
+            setTransactions(sortedTransactions);
           }
         }
       } catch (error) {
@@ -52,12 +90,12 @@ export function RecentTransactions({
     };
 
     fetchTransactions();
-  }, [propTransactions]);
+  }, [propTransactions, limit]);
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
+        {Array.from({ length: Math.min(limit, 5) }).map((_, i) => (
           <div key={i} className="flex items-center animate-pulse">
             <div className="bg-zinc-200 dark:bg-zinc-700 h-10 w-10 rounded-full mr-4"></div>
             <div className="flex-1 space-y-2">
@@ -85,65 +123,115 @@ export function RecentTransactions({
     );
   }
 
+  // Function to format date in a user-friendly way
+  const formatTransactionDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    if (isToday(date)) {
+      return `Today, ${format(date, "h:mm a")}`;
+    } else if (isYesterday(date)) {
+      return `Yesterday, ${format(date, "h:mm a")}`;
+    } else if (date.getFullYear() === new Date().getFullYear()) {
+      // If it's this year, don't show the year
+      return format(date, "MMM d, h:mm a");
+    } else {
+      // If it's a different year, show the year
+      return format(date, "MMM d, yyyy, h:mm a");
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {transactions.map((transaction) => {
-        const formattedDate = format(
-          new Date(transaction.date),
-          "MMM dd, yyyy"
-        );
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-sm font-medium text-muted-foreground">
+          {transactions.length} most recent transactions (showing up to {limit})
+        </h3>
+      </div>
 
-        return (
-          <div
-            key={transaction.id}
-            className="flex items-center p-3 rounded-lg hover:bg-muted/50 transition-colors"
-          >
+      <div className="max-h-[500px] overflow-y-auto pr-2">
+        {transactions.map((transaction) => {
+          // Use createdAt if available, otherwise use date
+          const dateToDisplay = transaction.createdAt || transaction.date;
+          const formattedDate = formatTransactionDate(dateToDisplay);
+          const timeAgo = formatDistanceToNow(new Date(dateToDisplay), {
+            addSuffix: true,
+          });
+
+          // Get appropriate colors based on transaction type and category
+          const bgColor =
+            transaction.type === "income"
+              ? getIncomeCategoryBgColor(transaction.category)
+              : getExpenseCategoryBgColor(transaction.category);
+
+          const textColor =
+            transaction.type === "income"
+              ? getIncomeCategoryTextColor(transaction.category)
+              : getExpenseCategoryTextColor(transaction.category);
+
+          const borderColor =
+            transaction.type === "income"
+              ? getIncomeCategoryBorderColor(transaction.category)
+              : getExpenseCategoryBorderColor(transaction.category);
+
+          // Icon background and text colors
+          const iconBgColor =
+            transaction.type === "income"
+              ? `${getIncomeCategoryBgColor(transaction.category)}`
+              : `${getExpenseCategoryBgColor(transaction.category)}`;
+
+          const iconTextColor =
+            transaction.type === "income"
+              ? `${getIncomeCategoryTextColor(transaction.category)}`
+              : `${getExpenseCategoryTextColor(transaction.category)}`;
+
+          return (
             <div
-              className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                transaction.type === "income" ? "bg-emerald-100" : "bg-rose-100"
-              }`}
+              key={transaction.id}
+              className="flex items-center p-3 rounded-lg hover:bg-muted/50 transition-colors"
             >
-              {transaction.type === "income" ? (
-                <TrendingUp className={`h-5 w-5 text-emerald-500`} />
-              ) : (
-                <TrendingDown className={`h-5 w-5 text-rose-500`} />
-              )}
-            </div>
-
-            <div className="ml-4 flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium truncate">
-                  {transaction.description || transaction.category}
-                </p>
-                <p
-                  className={`text-sm font-semibold ${
-                    transaction.type === "income"
-                      ? "text-emerald-600 dark:text-emerald-500"
-                      : "text-rose-600 dark:text-rose-500"
-                  }`}
-                >
-                  {transaction.type === "income" ? "+" : "-"}₹
-                  {transaction.amount.toLocaleString()}
-                </p>
+              <div
+                className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${iconBgColor}`}
+              >
+                {transaction.type === "income" ? (
+                  <TrendingUp className={`h-5 w-5 ${iconTextColor}`} />
+                ) : (
+                  <TrendingDown className={`h-5 w-5 ${iconTextColor}`} />
+                )}
               </div>
 
-              <div className="flex items-center text-xs text-muted-foreground">
-                <span className="mr-2">{formattedDate}</span>
-                <Badge
-                  variant="outline"
-                  className={`text-xs ${
-                    transaction.type === "income"
-                      ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
-                      : "border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400"
-                  }`}
-                >
-                  {transaction.category}
-                </Badge>
+              <div className="ml-4 flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium truncate">
+                    {transaction.description || transaction.category}
+                  </p>
+                  <p
+                    className={`text-sm font-semibold ${
+                      transaction.type === "income"
+                        ? "text-emerald-600 dark:text-emerald-500"
+                        : "text-rose-600 dark:text-rose-500"
+                    }`}
+                  >
+                    {transaction.type === "income" ? "+" : "-"}₹
+                    {transaction.amount.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <span className="mr-2" title={formattedDate}>
+                    {timeAgo}
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${bgColor} ${textColor} ${borderColor}`}
+                  >
+                    {transaction.category}
+                  </Badge>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
