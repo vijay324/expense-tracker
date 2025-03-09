@@ -8,21 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DollarSign,
-  CreditCard,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  BarChart4,
-  PieChart,
-  IndianRupee,
-  PiggyBank,
-} from "lucide-react";
+import { TrendingDown, Calendar, IndianRupee, PiggyBank } from "lucide-react";
 import { Overview } from "@/components/dashboard/overview";
 import { RecentTransactions } from "@/components/dashboard/transactions";
 import { QuickActions } from "@/components/dashboard/quick-actions";
-import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 interface DashboardData {
@@ -33,12 +22,11 @@ interface DashboardData {
   monthlyData: any[];
 }
 
-export default function DashboardPage() {
+export function DashboardClient() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     // First, ensure the user exists in our database

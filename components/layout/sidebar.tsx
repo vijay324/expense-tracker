@@ -23,7 +23,7 @@ const routes = [
   {
     label: "Dashboard",
     icon: <LayoutDashboard className="h-5 w-5" />,
-    href: "/",
+    href: "/dashboard",
     color: "text-sky-500",
   },
   {
@@ -40,7 +40,7 @@ const routes = [
   },
   {
     label: "Reports",
-    icon: <ChartNoAxesCombined className="h-5 w-5" />,
+    icon: <CreditCard className="h-5 w-5" />,
     href: "/reports",
     color: "text-amber-500",
   },
