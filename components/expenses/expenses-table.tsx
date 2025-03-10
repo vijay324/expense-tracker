@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
-import { Edit, Trash2, ArrowUpDown, Filter } from "lucide-react";
+import { Edit, Trash2, ArrowUpDown, Filter, Search } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
@@ -50,6 +50,7 @@ export function ExpensesTable({
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Sorting state
   const [sortField, setSortField] = useState<keyof Expense>("date");
@@ -167,11 +168,27 @@ export function ExpensesTable({
     });
   };
 
-  // Apply sorting and filtering
+  // Apply sorting, filtering, and searching
   const filteredAndSortedExpenses = useMemo(() => {
-    // First apply filters
+    // First apply search
     let result = [...expenses];
 
+    // Apply search query if it exists
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (expense) =>
+          expense.category.toLowerCase().includes(query) ||
+          (expense.description &&
+            expense.description.toLowerCase().includes(query)) ||
+          expense.amount.toString().includes(query) ||
+          format(new Date(expense.date), "MMM dd, yyyy")
+            .toLowerCase()
+            .includes(query)
+      );
+    }
+
+    // Then apply filters
     // Filter by category
     if (filters.category) {
       result = result.filter(
@@ -229,7 +246,7 @@ export function ExpensesTable({
     });
 
     return result;
-  }, [expenses, sortField, sortDirection, filters]);
+  }, [expenses, sortField, sortDirection, filters, searchQuery]);
 
   // Get sort indicator
   const getSortIndicator = (field: keyof Expense) => {
@@ -283,18 +300,30 @@ export function ExpensesTable({
   ).length;
 
   return (
-    <>
-      <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
-        <div className="flex flex-wrap gap-2">
+    <div className="space-y-4">
+      {/* Search and Filter Controls */}
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search expenses by any field..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 w-full"
+          />
+        </div>
+
+        <div className="flex gap-2">
           {/* Sorting dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
-                <ArrowUpDown className="mr-2 h-4 w-4" />
+              <Button variant="outline" className="gap-1">
+                <ArrowUpDown className="h-4 w-4" />
                 Sort
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleSort("date")}>
                 Date{" "}
                 {sortField === "date" && (sortDirection === "asc" ? "↑" : "↓")}
@@ -315,15 +344,12 @@ export function ExpensesTable({
           {/* Filter popover */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-                {activeFiltersCount > 0 && (
-                  <Badge
-                    className="ml-1 bg-primary text-primary-foreground"
-                    variant="secondary"
-                  >
-                    {activeFiltersCount}
+              <Button variant="outline" className="gap-1">
+                <Filter className="h-4 w-4" />
+                Filters
+                {Object.values(filters).some((v) => v) && (
+                  <Badge variant="secondary" className="ml-1 px-1">
+                    {Object.values(filters).filter((v) => v).length}
                   </Badge>
                 )}
               </Button>
@@ -336,7 +362,7 @@ export function ExpensesTable({
                   <Label htmlFor="category">Category</Label>
                   <select
                     id="category"
-                    className="w-full p-2 border rounded-md dark:bg-zinc-800 dark:border-zinc-700"
+                    className="w-full p-2 border rounded-md"
                     value={filters.category}
                     onChange={(e) =>
                       handleFilterChange("category", e.target.value)
@@ -369,7 +395,7 @@ export function ExpensesTable({
                     <Input
                       id="maxAmount"
                       type="number"
-                      placeholder="Max"
+                      placeholder="1000"
                       value={filters.maxAmount}
                       onChange={(e) =>
                         handleFilterChange("maxAmount", e.target.value)
@@ -404,8 +430,13 @@ export function ExpensesTable({
                 </div>
 
                 <div className="flex justify-between">
-                  <Button variant="outline" size="sm" onClick={resetFilters}>
-                    Reset
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={resetFilters}
+                    className="w-full"
+                  >
+                    Reset Filters
                   </Button>
                 </div>
               </div>
@@ -414,15 +445,24 @@ export function ExpensesTable({
         </div>
       </div>
 
-      <DataTable
-        data={filteredAndSortedExpenses}
-        columns={columns}
-        onEdit={handleEdit}
-        onDelete={(expense) => {
-          setExpenseToDelete(expense);
-          setIsDeleting(true);
-        }}
-      />
+      {/* Show message when no results */}
+      {filteredAndSortedExpenses.length === 0 ? (
+        <div className="text-center p-6 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+          <p className="text-zinc-500 dark:text-zinc-400">
+            No expenses match your search or filters. Try different criteria.
+          </p>
+        </div>
+      ) : (
+        <DataTable
+          data={filteredAndSortedExpenses}
+          columns={columns}
+          onEdit={handleEdit}
+          onDelete={(expense) => {
+            setExpenseToDelete(expense);
+            setIsDeleting(true);
+          }}
+        />
+      )}
 
       {/* Edit Modal */}
       {isEditing && expenseToEdit && (
@@ -459,6 +499,6 @@ export function ExpensesTable({
         cancelText="Cancel"
         variant="destructive"
       />
-    </>
+    </div>
   );
 }
