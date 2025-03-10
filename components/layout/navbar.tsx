@@ -25,7 +25,7 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/35 dark:bg-zinc-900/40 backdrop-blur-xs border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 lg:px-6 shadow-sm">
+    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/45 dark:bg-zinc-900/40 backdrop-blur-xs border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 lg:px-6">
       <div className="h-full flex items-center justify-between">
         {/* Left section - Page Title (visible on desktop) */}
         <div className="flex items-center">
