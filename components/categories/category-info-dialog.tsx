@@ -47,9 +47,14 @@ export function CategoryInfoDialog({
   // Income categories
   const incomeCategories = [
     {
-      name: "Salary",
+      name: "Investment",
       description:
-        "Regular income from employment, typically paid on a fixed schedule.",
+        "Returns from stocks, bonds, mutual funds, or other investment vehicles.",
+    },
+    {
+      name: "Business",
+      description:
+        "Revenue generated from the operation of a business, typically earned through the sale of goods or services.",
     },
     {
       name: "Freelance",
@@ -57,9 +62,9 @@ export function CategoryInfoDialog({
         "Income earned from contract or freelance work on a project basis.",
     },
     {
-      name: "Investment",
+      name: "Salary",
       description:
-        "Returns from stocks, bonds, mutual funds, or other investment vehicles.",
+        "Regular income from employment, typically paid on a fixed schedule.",
     },
     {
       name: "Bonus",
@@ -107,6 +112,11 @@ export function CategoryInfoDialog({
       name: "Housing",
       description:
         "Rent, mortgage payments, property taxes, and home insurance.",
+    },
+    {
+      name: "Business Investment",
+      description:
+        "Capital allocated to start or grow a business, with the expectation of earning a return or profit.",
     },
     {
       name: "Food",

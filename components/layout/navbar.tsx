@@ -25,7 +25,7 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xs border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 lg:px-6">
+    <div className="fixed top-0 left-0 right-0 h-16 z-30 bg-white/35 dark:bg-zinc-900/35 backdrop-blur-xs border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 lg:px-6">
       <div className="h-full flex items-center justify-between">
         {/* Left section - Page Title (visible on desktop) */}
         <div className="flex items-center">
@@ -38,15 +38,15 @@ export function Navbar({ toggleSidebar, isMobile }: NavbarProps) {
           {/* Mobile brand */}
           <div className="flex lg:hidden items-center">
             <div className="w-8 h-8 mr-2 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-lg">ET</span>
+              <span className="text-white font-bold text-lg">SF</span>
             </div>
             <h1 className="text-lg font-bold">
               <span className="hidden xs:inline bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                Expense
+                Financial
               </span>
-              <span className="xs:hidden bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
-                E
-              </span>
+              {/* <span className="xs:hidden bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
+                F
+              </span> */}
               <span className="text-primary">Tracker</span>
             </h1>
           </div>

@@ -59,7 +59,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
   const isDashboardActive = pathname === "/dashboard" || pathname === "/";
 
   return (
-    <div className="h-full flex flex-col bg-white/80 dark:bg-zinc-900/90 backdrop-blur-xs border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+    <div className="h-full flex flex-col bg-white/65 dark:bg-zinc-900/60 backdrop-blur-xs border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       {/* Mobile close button */}
       {closeMobileSidebar && (
         <div className="absolute top-4 right-4 lg:hidden">
@@ -67,7 +67,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
             variant="ghost"
             size="icon"
             onClick={closeMobileSidebar}
-            className="rounded-full h-8 w-8 bg-white/90 dark:bg-zinc-800/90 shadow-sm hover:shadow-md transition-all"
+            className="rounded-full h-8 w-8 bg-white/60 dark:bg-zinc-800/90 shadow-sm hover:shadow-md transition-all"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -78,11 +78,11 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
       <div className="px-6 py-8">
         <div className="flex items-center">
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-md">
-            <span className="text-white font-bold text-xl">ET</span>
+            <span className="text-white font-bold text-xl">SF</span>
           </div>
           <span className="ml-3 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 truncate">
-            <span className="hidden sm:inline">Expense</span>
-            <span className="sm:hidden">E</span>
+            <span className="hidden sm:inline">Sathram</span>
+            {/* <span className="sm:hidden">F</span> */}
             <span className="text-primary">Tracker</span>
           </span>
         </div>
