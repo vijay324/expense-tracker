@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
+import { broadcastEvent } from "../../events/route";
 
 interface Income {
   id: string;
@@ -61,9 +62,52 @@ export const GET: Handler<Income> = async (req, { params }) => {
   }
 };
 
+// Helper function to validate CSRF protection
+const validateCSRF = (request: Request) => {
+  // In development environment, skip CSRF validation
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+
+  // Check for the presence of a valid referer header
+  const referer = request.headers.get("referer");
+  if (!referer) {
+    // If no referer, check for custom header that our app sets
+    const appOrigin = request.headers.get("x-app-origin");
+    return !!appOrigin;
+  }
+
+  // Ensure the referer is from the same origin
+  try {
+    const refererUrl = new URL(referer);
+    const requestUrl = new URL(request.url);
+
+    // Check if origins match or if referer is from a trusted domain
+    const trustedDomains = [
+      requestUrl.origin,
+      // Add any other trusted domains here
+    ];
+
+    return trustedDomains.includes(refererUrl.origin);
+  } catch (error) {
+    console.error("Error validating CSRF:", error);
+    return false;
+  }
+};
+
 // Update a specific income entry
 export const PATCH: Handler<Income> = async (req, { params }) => {
   try {
+    // Validate CSRF protection
+    if (!validateCSRF(req)) {
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid request origin" }),
+        {
+          status: 403,
+        }
+      );
+    }
+
     const { userId } = await auth();
 
     if (!userId) {
@@ -108,14 +152,27 @@ export const PATCH: Handler<Income> = async (req, { params }) => {
 
     return NextResponse.json(income);
   } catch (error) {
-    console.error("[INCOME_PATCH]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error updating income:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500 }
+    );
   }
 };
 
 // Delete a specific income entry
 export const DELETE: Handler = async (req, { params }) => {
   try {
+    // Validate CSRF protection
+    if (!validateCSRF(req)) {
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid request origin" }),
+        {
+          status: 403,
+        }
+      );
+    }
+
     const { userId } = await auth();
 
     if (!userId) {
@@ -151,7 +208,10 @@ export const DELETE: Handler = async (req, { params }) => {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error("[INCOME_DELETE]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error deleting income:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500 }
+    );
   }
 };

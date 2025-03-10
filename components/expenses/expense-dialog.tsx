@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import { Plus } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 interface ExpenseDialogProps {
   buttonVariant?:
@@ -26,6 +27,9 @@ interface ExpenseDialogProps {
   showIcon?: boolean;
   className?: string;
   onSuccess?: () => void;
+  onError?: (error: any) => void;
+  isLoading?: boolean;
+  setIsLoading?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function ExpenseDialog({
@@ -35,8 +39,17 @@ export function ExpenseDialog({
   showIcon = true,
   className = "",
   onSuccess,
+  onError,
+  isLoading: externalIsLoading,
+  setIsLoading: externalSetIsLoading,
 }: ExpenseDialogProps) {
   const [open, setOpen] = useState(false);
+  const [internalIsLoading, setInternalIsLoading] = useState(false);
+
+  // Use external loading state if provided, otherwise use internal
+  const isLoading =
+    externalIsLoading !== undefined ? externalIsLoading : internalIsLoading;
+  const setIsLoading = externalSetIsLoading || setInternalIsLoading;
 
   const handleSuccess = () => {
     setOpen(false);
@@ -45,10 +58,21 @@ export function ExpenseDialog({
     }
   };
 
+  const handleError = (error: any) => {
+    if (onError) {
+      onError(error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={buttonVariant} size={buttonSize} className={className}>
+        <Button
+          variant={buttonVariant}
+          size={buttonSize}
+          className={className}
+          disabled={isLoading}
+        >
           {showIcon && <Plus className="mr-2 h-4 w-4" />}
           {buttonText}
         </Button>
@@ -62,7 +86,10 @@ export function ExpenseDialog({
         </DialogHeader>
         <ExpenseForm
           onSuccess={handleSuccess}
+          onError={handleError}
           onCancel={() => setOpen(false)}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
         />
       </DialogContent>
     </Dialog>

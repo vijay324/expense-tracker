@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
+import { broadcastEvent } from "../events/route";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -16,6 +17,39 @@ interface Expense {
   date: Date;
   userId: string;
 }
+
+// Helper function to validate CSRF protection
+const validateCSRF = (request: Request) => {
+  // In development environment, skip CSRF validation
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+
+  // Check for the presence of a valid referer header
+  const referer = request.headers.get("referer");
+  if (!referer) {
+    // If no referer, check for custom header that our app sets
+    const appOrigin = request.headers.get("x-app-origin");
+    return !!appOrigin;
+  }
+
+  // Ensure the referer is from the same origin
+  try {
+    const refererUrl = new URL(referer);
+    const requestUrl = new URL(request.url);
+
+    // Check if origins match or if referer is from a trusted domain
+    const trustedDomains = [
+      requestUrl.origin,
+      // Add any other trusted domains here
+    ];
+
+    return trustedDomains.includes(refererUrl.origin);
+  } catch (error) {
+    console.error("Error validating CSRF:", error);
+    return false;
+  }
+};
 
 // Get all expense entries for the current user
 export async function GET(request: Request) {
@@ -89,17 +123,21 @@ export async function GET(request: Request) {
 // Create a new expense entry
 export const POST: Handler<Expense> = async (req) => {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    // Validate CSRF protection
+    if (!validateCSRF(req)) {
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid request origin" }),
+        {
+          status: 403,
+        }
+      );
     }
 
-    const body = await req.json();
-    const { amount, category, description, date } = body;
-
-    if (!amount || !category || !date) {
-      return new NextResponse("Missing required fields", { status: 400 });
+    const { userId } = await auth();
+    if (!userId) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     // Get the user from our database
@@ -110,23 +148,52 @@ export const POST: Handler<Expense> = async (req) => {
     });
 
     if (!user) {
-      return new NextResponse("User not found", { status: 404 });
+      return new NextResponse(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+      });
     }
 
-    // Create a new expense entry
+    const body = await req.json();
+
+    // Validate required fields
+    if (!body.amount || !body.category || !body.date) {
+      return new NextResponse(
+        JSON.stringify({
+          error: "Missing required fields: amount, category, date",
+        }),
+        { status: 400 }
+      );
+    }
+
+    // Validate amount is a positive number
+    const amount = parseFloat(body.amount);
+    if (isNaN(amount) || amount <= 0) {
+      return new NextResponse(
+        JSON.stringify({ error: "Amount must be a positive number" }),
+        { status: 400 }
+      );
+    }
+
+    // Create the expense entry
     const expense = await prisma.expense.create({
       data: {
-        amount: parseFloat(amount),
-        category,
-        description: description || "",
-        date: new Date(date),
+        amount,
+        category: body.category,
+        description: body.description || null,
+        date: new Date(body.date),
         userId: user.id,
       },
     });
 
-    return NextResponse.json(expense);
+    // Broadcast the event to all connected clients
+    broadcastEvent("EXPENSE_CREATED", expense);
+
+    return new NextResponse(JSON.stringify(expense), { status: 201 });
   } catch (error) {
-    console.error("[EXPENSE_POST]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error creating expense:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500 }
+    );
   }
 };

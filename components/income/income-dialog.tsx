@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { IncomeForm } from "@/components/income/income-form";
 import { Plus } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 interface IncomeDialogProps {
   buttonVariant?:
@@ -26,6 +27,9 @@ interface IncomeDialogProps {
   showIcon?: boolean;
   className?: string;
   onSuccess?: () => void;
+  onError?: (error: any) => void;
+  isLoading?: boolean;
+  setIsLoading?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function IncomeDialog({
@@ -35,8 +39,17 @@ export function IncomeDialog({
   showIcon = true,
   className = "",
   onSuccess,
+  onError,
+  isLoading: externalIsLoading,
+  setIsLoading: externalSetIsLoading,
 }: IncomeDialogProps) {
   const [open, setOpen] = useState(false);
+  const [internalIsLoading, setInternalIsLoading] = useState(false);
+
+  // Use external loading state if provided, otherwise use internal
+  const isLoading =
+    externalIsLoading !== undefined ? externalIsLoading : internalIsLoading;
+  const setIsLoading = externalSetIsLoading || setInternalIsLoading;
 
   const handleSuccess = () => {
     setOpen(false);
@@ -45,10 +58,21 @@ export function IncomeDialog({
     }
   };
 
+  const handleError = (error: any) => {
+    if (onError) {
+      onError(error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={buttonVariant} size={buttonSize} className={className}>
+        <Button
+          variant={buttonVariant}
+          size={buttonSize}
+          className={className}
+          disabled={isLoading}
+        >
           {showIcon && <Plus className="mr-2 h-4 w-4" />}
           {buttonText}
         </Button>
@@ -60,7 +84,13 @@ export function IncomeDialog({
             Enter the details of your income below.
           </DialogDescription>
         </DialogHeader>
-        <IncomeForm onSuccess={handleSuccess} onCancel={() => setOpen(false)} />
+        <IncomeForm
+          onSuccess={handleSuccess}
+          onError={handleError}
+          onCancel={() => setOpen(false)}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+        />
       </DialogContent>
     </Dialog>
   );

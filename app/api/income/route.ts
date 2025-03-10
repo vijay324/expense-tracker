@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
+import { broadcastEvent } from "../events/route";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -16,6 +17,39 @@ interface Income {
   date: Date;
   userId: string;
 }
+
+// Helper function to validate CSRF protection
+const validateCSRF = (request: Request) => {
+  // In development environment, skip CSRF validation
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+
+  // Check for the presence of a valid referer header
+  const referer = request.headers.get("referer");
+  if (!referer) {
+    // If no referer, check for custom header that our app sets
+    const appOrigin = request.headers.get("x-app-origin");
+    return !!appOrigin;
+  }
+
+  // Ensure the referer is from the same origin
+  try {
+    const refererUrl = new URL(referer);
+    const requestUrl = new URL(request.url);
+
+    // Check if origins match or if referer is from a trusted domain
+    const trustedDomains = [
+      requestUrl.origin,
+      // Add any other trusted domains here
+    ];
+
+    return trustedDomains.includes(refererUrl.origin);
+  } catch (error) {
+    console.error("Error validating CSRF:", error);
+    return false;
+  }
+};
 
 // Get all income entries for the current user
 export async function GET(request: Request) {
@@ -89,10 +123,21 @@ export async function GET(request: Request) {
 // Create a new income entry
 export const POST: Handler<Income> = async (req) => {
   try {
-    const { userId } = await auth();
+    // Validate CSRF protection
+    if (!validateCSRF(req)) {
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid request origin" }),
+        {
+          status: 403,
+        }
+      );
+    }
 
+    const { userId } = await auth();
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     const body = await req.json();
@@ -126,7 +171,10 @@ export const POST: Handler<Income> = async (req) => {
 
     return NextResponse.json(income);
   } catch (error) {
-    console.error("[INCOME_POST]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error creating income:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500 }
+    );
   }
 };

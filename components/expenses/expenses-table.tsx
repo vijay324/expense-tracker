@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { getExpenseCategoryColor } from "@/lib/category-colors";
+import realtimeService from "@/lib/websocket-service";
 
 interface Expense {
   id: string;
@@ -80,9 +81,10 @@ export function ExpensesTable({
     return Array.from(categories).sort();
   }, [expenses]);
 
-  // Fetch expenses on mount and set up interval for real-time updates
+  // Fetch expenses on mount and set up real-time updates
   const fetchExpenses = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch("/api/expenses");
       if (!response.ok) {
         throw new Error("Failed to fetch expenses");
@@ -95,6 +97,9 @@ export function ExpensesTable({
       setExpenses(sortedData);
     } catch (error) {
       console.error("Error fetching expenses:", error);
+      toast.error("Failed to load expenses");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,11 +107,51 @@ export function ExpensesTable({
     // Initial fetch
     fetchExpenses();
 
-    // Set up interval for real-time updates (every 5 seconds)
-    const intervalId = setInterval(fetchExpenses, 5000);
+    // Set up real-time updates
+    const unsubscribeCreated = realtimeService.subscribe(
+      "EXPENSE_CREATED",
+      (newExpense) => {
+        setExpenses((prevExpenses) => {
+          const updatedExpenses = [newExpense, ...prevExpenses];
+          // Sort by date (most recent first)
+          return updatedExpenses.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+        });
+        toast.success("New expense added");
+      }
+    );
 
-    // Clean up interval on unmount
-    return () => clearInterval(intervalId);
+    const unsubscribeUpdated = realtimeService.subscribe(
+      "EXPENSE_UPDATED",
+      (updatedExpense) => {
+        setExpenses((prevExpenses) => {
+          return prevExpenses
+            .map((expense) =>
+              expense.id === updatedExpense.id ? updatedExpense : expense
+            )
+            .sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
+        });
+      }
+    );
+
+    const unsubscribeDeleted = realtimeService.subscribe(
+      "EXPENSE_DELETED",
+      (deletedExpense) => {
+        setExpenses((prevExpenses) =>
+          prevExpenses.filter((expense) => expense.id !== deletedExpense.id)
+        );
+      }
+    );
+
+    // Clean up subscriptions on unmount
+    return () => {
+      unsubscribeCreated();
+      unsubscribeUpdated();
+      unsubscribeDeleted();
+    };
   }, []);
 
   const handleDelete = async () => {

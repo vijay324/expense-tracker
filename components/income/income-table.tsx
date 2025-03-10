@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { getIncomeCategoryColor } from "@/lib/category-colors";
+import realtimeService from "@/lib/websocket-service";
 
 interface Income {
   id: string;
@@ -80,9 +81,10 @@ export function IncomeTable({
     return Array.from(categories).sort();
   }, [incomes]);
 
-  // Fetch incomes on mount and set up interval for real-time updates
+  // Fetch incomes on mount and set up real-time updates
   const fetchIncomes = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch("/api/income");
       if (!response.ok) {
         throw new Error("Failed to fetch income entries");
@@ -95,6 +97,9 @@ export function IncomeTable({
       setIncomes(sortedData);
     } catch (error) {
       console.error("Error fetching income:", error);
+      toast.error("Failed to load income data");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,11 +107,51 @@ export function IncomeTable({
     // Initial fetch
     fetchIncomes();
 
-    // Set up interval for real-time updates (every 5 seconds)
-    const intervalId = setInterval(fetchIncomes, 5000);
+    // Set up real-time updates
+    const unsubscribeCreated = realtimeService.subscribe(
+      "INCOME_CREATED",
+      (newIncome) => {
+        setIncomes((prevIncomes) => {
+          const updatedIncomes = [newIncome, ...prevIncomes];
+          // Sort by date (most recent first)
+          return updatedIncomes.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+        });
+        toast.success("New income added");
+      }
+    );
 
-    // Clean up interval on unmount
-    return () => clearInterval(intervalId);
+    const unsubscribeUpdated = realtimeService.subscribe(
+      "INCOME_UPDATED",
+      (updatedIncome) => {
+        setIncomes((prevIncomes) => {
+          return prevIncomes
+            .map((income) =>
+              income.id === updatedIncome.id ? updatedIncome : income
+            )
+            .sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
+        });
+      }
+    );
+
+    const unsubscribeDeleted = realtimeService.subscribe(
+      "INCOME_DELETED",
+      (deletedIncome) => {
+        setIncomes((prevIncomes) =>
+          prevIncomes.filter((income) => income.id !== deletedIncome.id)
+        );
+      }
+    );
+
+    // Clean up subscriptions on unmount
+    return () => {
+      unsubscribeCreated();
+      unsubscribeUpdated();
+      unsubscribeDeleted();
+    };
   }, []);
 
   const handleDelete = async () => {
