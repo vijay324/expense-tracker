@@ -466,8 +466,8 @@ export function IncomeTable({
 
       {/* Edit Modal */}
       {isEditing && incomeToEdit && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg w-full max-w-md p-6">
+        <div className="fixed inset-0 z-50  bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg drop-shadow-2xl w-full max-w-md p-6">
             <h2 className="text-xl font-semibold mb-4">Edit Income</h2>
             <IncomeForm
               initialData={{

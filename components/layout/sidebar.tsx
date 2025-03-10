@@ -59,7 +59,7 @@ export function Sidebar({ closeMobileSidebar }: SidebarProps) {
   const isDashboardActive = pathname === "/dashboard" || pathname === "/";
 
   return (
-    <div className="h-full flex flex-col bg-white/65 dark:bg-zinc-900/60 backdrop-blur-xs border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+    <div className="h-full flex flex-col bg-white/70 dark:bg-zinc-900/60 backdrop-blur-xs border-r border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
       {/* Mobile close button */}
       {closeMobileSidebar && (
         <div className="absolute top-4 right-4 lg:hidden">

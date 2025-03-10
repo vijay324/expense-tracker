@@ -22,17 +22,17 @@ export function QuickActions() {
         <div className="flex flex-col sm:flex-row gap-3">
           <ExpenseDialog
             buttonVariant="expense"
-            className="w-full sm:w-auto mx-2"
+            className="w-full sm:w-auto"
             onSuccess={handleSuccess}
           />
           <IncomeDialog
             buttonVariant="income"
-            className="w-full sm:w-auto mx-2"
+            className="w-full sm:w-auto"
             onSuccess={handleSuccess}
           />
           <CategoryInfoDialog
             buttonVariant="outline"
-            className="w-full sm:w-auto mx-2"
+            className="w-full sm:w-auto"
           />
         </div>
       </CardContent>

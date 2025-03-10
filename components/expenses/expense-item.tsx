@@ -111,7 +111,7 @@ export function ExpenseItem({ expense, onDelete }: ExpenseItemProps) {
 
       {/* Edit Modal */}
       {isEditing && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-white/35 dark:bg-black/50 backdrop-blur-xl flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
             <h2 className="text-xl font-semibold mb-4">Edit Expense</h2>
             <ExpenseForm
