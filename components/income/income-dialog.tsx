@@ -9,18 +9,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { IncomeForm } from "@/components/income/income-form";
 import { Plus } from "lucide-react";
 
 interface IncomeDialogProps {
-  buttonVariant?:
-    | "default"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link"
-    | "destructive";
+  buttonVariant?: ButtonProps["variant"];
   buttonSize?: "default" | "sm" | "lg" | "icon";
   buttonText?: string;
   showIcon?: boolean;

@@ -161,28 +161,33 @@ export function ExpenseForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Housing">Housing</SelectItem>
+                    <SelectItem value="Utilities">Utilities</SelectItem>
+                    <SelectItem value="Bills & Recharge">
+                      Bills & Recharge
+                    </SelectItem>
+                    <SelectItem value="Business Investments">
+                      Business Investments
+                    </SelectItem>
+                    <SelectItem value="Education">
+                      Education & courses
+                    </SelectItem>
+                    <SelectItem value="Travel">Travel</SelectItem>
+                    <SelectItem value="Entertainment">Entertainment</SelectItem>
                     <SelectItem value="Food">Food</SelectItem>
                     <SelectItem value="Groceries">Groceries</SelectItem>
                     <SelectItem value="Restaurant & Dining Out">
                       Restaurant & Dining Out
                     </SelectItem>
+                    <SelectItem value="Healthcare">Healthcare</SelectItem>
                     <SelectItem value="Transportation">
                       Transportation
                     </SelectItem>
-                    <SelectItem value="Utilities">Utilities</SelectItem>
-                    <SelectItem value="Bills & Recharge">
-                      Bills & Recharge
-                    </SelectItem>
-                    <SelectItem value="Healthcare">Healthcare</SelectItem>
+                    <SelectItem value="Housing">Housing</SelectItem>
                     <SelectItem value="Insurance">Insurance</SelectItem>
                     <SelectItem value="Debt Payments">Debt Payments</SelectItem>
-                    <SelectItem value="Entertainment">Entertainment</SelectItem>
                     <SelectItem value="Shopping">Shopping</SelectItem>
                     <SelectItem value="Subscriptions">Subscriptions</SelectItem>
-                    <SelectItem value="Education">Education</SelectItem>
                     <SelectItem value="Personal Care">Personal Care</SelectItem>
-                    <SelectItem value="Travel">Travel</SelectItem>
                     <SelectItem value="Gifts & Donations">
                       Gifts & Donations
                     </SelectItem>

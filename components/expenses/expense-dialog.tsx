@@ -9,18 +9,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import { Plus } from "lucide-react";
 
 interface ExpenseDialogProps {
-  buttonVariant?:
-    | "default"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link"
-    | "destructive";
+  buttonVariant?: ButtonProps["variant"];
   buttonSize?: "default" | "sm" | "lg" | "icon";
   buttonText?: string;
   showIcon?: boolean;

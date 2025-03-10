@@ -31,6 +31,12 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import {
+  getIncomeCategoryBgColor,
+  getExpenseCategoryBgColor,
+  getIncomeCategoryTextColor,
+  getExpenseCategoryTextColor,
+} from "@/lib/category-colors";
 
 interface ReportsClientProps {
   yearsWithData: number[];
@@ -81,18 +87,92 @@ const MONTHS = [
   "December",
 ];
 
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#8884D8",
-  "#82CA9D",
-  "#A4DE6C",
-  "#D0ED57",
-  "#FFC658",
-  "#FF7300",
-];
+// Helper function to get tailwind bg color and convert to hex for charts
+const getTailwindColorHex = (tailwindClass: string): string => {
+  // Map of tailwind color classes to high-contrast hex values for both light and dark modes
+  const colorMap: Record<string, string> = {
+    // Blues (High Contrast)
+    "bg-blue-50": "#1E88E5", // Bright medium blue
+    "bg-blue-100": "#1976D2", // Slightly darker blue
+    "bg-blue-700": "#0D47A1", // Deep blue
+    // Greens (High Contrast)
+    "bg-green-50": "#43A047", // Bright medium green
+    "bg-green-100": "#388E3C", // Slightly darker green
+    "bg-green-700": "#1B5E20", // Deep green
+    // Emeralds (High Contrast)
+    "bg-emerald-50": "#00BFA5", // Bright teal
+    "bg-emerald-100": "#00897B", // Medium teal
+    "bg-emerald-700": "#004D40", // Deep teal
+    // Purples (High Contrast)
+    "bg-purple-50": "#8E24AA", // Bright medium purple
+    "bg-purple-100": "#7B1FA2", // Slightly darker purple
+    "bg-purple-700": "#4A148C", // Deep purple
+    // Ambers (High Contrast)
+    "bg-amber-50": "#FFB300", // Bright amber
+    "bg-amber-100": "#FFA000", // Medium amber
+    "bg-amber-700": "#FF6F00", // Deep amber
+    // Limes (High Contrast)
+    "bg-lime-50": "#C0CA33", // Bright lime
+    "bg-lime-100": "#AFB42B", // Medium lime
+    "bg-lime-700": "#827717", // Deep lime
+    // Teals (High Contrast)
+    "bg-teal-50": "#26A69A", // Bright teal
+    "bg-teal-100": "#00897B", // Medium teal
+    "bg-teal-700": "#00695C", // Deep teal
+    // Cyans (High Contrast)
+    "bg-cyan-50": "#00ACC1", // Bright cyan
+    "bg-cyan-100": "#0097A7", // Medium cyan
+    "bg-cyan-700": "#006064", // Deep cyan
+    // Indigos (High Contrast)
+    "bg-indigo-50": "#5C6BC0", // Bright indigo
+    "bg-indigo-100": "#3F51B5", // Medium indigo
+    "bg-indigo-700": "#283593", // Deep indigo
+    // Fuchsias (High Contrast)
+    "bg-fuchsia-50": "#D500F9", // Bright fuchsia
+    "bg-fuchsia-100": "#C51162", // Medium fuchsia
+    "bg-fuchsia-700": "#AA00FF", // Deep fuchsia
+    // Violets (High Contrast)
+    "bg-violet-50": "#9575CD", // Bright violet
+    "bg-violet-100": "#7E57C2", // Medium violet
+    "bg-violet-700": "#5E35B1", // Deep violet
+    // Pinks (High Contrast)
+    "bg-pink-50": "#EC407A", // Bright pink
+    "bg-pink-100": "#D81B60", // Medium pink
+    "bg-pink-700": "#AD1457", // Deep pink
+    // Roses (High Contrast)
+    "bg-rose-50": "#F06292", // Bright rose
+    "bg-rose-100": "#E91E63", // Medium rose
+    "bg-rose-700": "#C2185B", // Deep rose
+    // Oranges (High Contrast)
+    "bg-orange-50": "#FF9800", // Bright orange
+    "bg-orange-100": "#FB8C00", // Medium orange
+    "bg-orange-700": "#E65100", // Deep orange
+    // Reds (High Contrast)
+    "bg-red-50": "#F44336", // Bright red
+    "bg-red-100": "#E53935", // Medium red
+    "bg-red-700": "#C62828", // Deep red
+    // Slates (High Contrast)
+    "bg-slate-50": "#607D8B", // Bright slate
+    "bg-slate-100": "#546E7A", // Medium slate
+    "bg-slate-700": "#37474F", // Deep slate
+    // Default (High Contrast Grays)
+    "bg-gray-50": "#757575", // Bright gray
+    "bg-gray-100": "#616161", // Medium gray
+    "bg-gray-700": "#424242", // Deep gray
+  };
+
+  // Extract the color from the tailwind class
+  return colorMap[tailwindClass] || "#455A64"; // Default to a visible blue-gray if not found
+};
+
+// Helper function to get category color for charts
+const getCategoryChartColor = (category: string, isIncome: boolean): string => {
+  const bgColor = isIncome
+    ? getIncomeCategoryBgColor(category)
+    : getExpenseCategoryBgColor(category);
+
+  return getTailwindColorHex(bgColor);
+};
 
 // Client component that uses search params
 function ReportsClientContent({
@@ -806,7 +886,7 @@ function ReportsClientContent({
                           {incomeByCategory.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
+                              fill={getCategoryChartColor(entry.name, true)}
                             />
                           ))}
                         </Pie>
@@ -846,8 +926,30 @@ function ReportsClientContent({
                     </thead>
                     <tbody>
                       {incomeByCategory.map((category, index) => (
-                        <tr key={index} className="border-b">
-                          <td className="py-3 px-4">{category.name}</td>
+                        <tr
+                          key={index}
+                          className="border-b"
+                          style={{
+                            backgroundColor:
+                              getTailwindColorHex(
+                                getIncomeCategoryBgColor(category.name)
+                              ) + "20", // Adding 20 for transparency
+                          }}
+                        >
+                          <td className="py-3 px-4">
+                            <div className="flex items-center">
+                              <div
+                                className="w-3 h-3 rounded-full mr-2"
+                                style={{
+                                  backgroundColor: getCategoryChartColor(
+                                    category.name,
+                                    true
+                                  ),
+                                }}
+                              ></div>
+                              {category.name}
+                            </div>
+                          </td>
                           <td className="text-right py-3 px-4">
                             ₹{category.value.toLocaleString()}
                           </td>
@@ -899,10 +1001,10 @@ function ReportsClientContent({
                           }
                           dataKey="value"
                         >
-                          {incomeByCategory.map((entry, index) => (
+                          {expensesByCategory.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
+                              fill={getCategoryChartColor(entry.name, false)}
                             />
                           ))}
                         </Pie>
@@ -942,8 +1044,30 @@ function ReportsClientContent({
                     </thead>
                     <tbody>
                       {expensesByCategory.map((category, index) => (
-                        <tr key={index} className="border-b">
-                          <td className="py-3 px-4">{category.name}</td>
+                        <tr
+                          key={index}
+                          className="border-b"
+                          style={{
+                            backgroundColor:
+                              getTailwindColorHex(
+                                getExpenseCategoryBgColor(category.name)
+                              ) + "20", // Adding 20 for transparency
+                          }}
+                        >
+                          <td className="py-3 px-4">
+                            <div className="flex items-center">
+                              <div
+                                className="w-3 h-3 rounded-full mr-2"
+                                style={{
+                                  backgroundColor: getCategoryChartColor(
+                                    category.name,
+                                    false
+                                  ),
+                                }}
+                              ></div>
+                              {category.name}
+                            </div>
+                          </td>
                           <td className="text-right py-3 px-4">
                             ₹{category.value.toLocaleString()}
                           </td>
