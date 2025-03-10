@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
-import { broadcastEvent } from "../../events/route";
+import { broadcastEvent } from "@/lib/event-service";
 
 interface Expense {
   id: string;

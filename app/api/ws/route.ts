@@ -1,25 +1,5 @@
 import { NextRequest } from "next/server";
-import { WebSocketEventType } from "@/lib/websocket-service";
 import { auth } from "@clerk/nextjs/server";
-
-// Store active connections
-const activeConnections = new Map<string, any>();
-
-// Function to broadcast to all connections except sender
-export function broadcast(
-  type: WebSocketEventType,
-  payload: any,
-  excludeUserId?: string
-) {
-  const message = JSON.stringify({ type, payload });
-
-  activeConnections.forEach((socket, userId) => {
-    if (userId !== excludeUserId && socket.readyState === 1) {
-      // 1 = OPEN
-      socket.send(message);
-    }
-  });
-}
 
 export async function GET(req: NextRequest) {
   // Next.js doesn't natively support WebSockets in API routes

@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
-import { broadcastEvent } from "../events/route";
+import { broadcastEvent } from "@/lib/event-service";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -168,6 +168,9 @@ export const POST: Handler<Income> = async (req) => {
         userId: user.id,
       },
     });
+
+    // Broadcast the event to all connected clients
+    broadcastEvent("INCOME_CREATED", income);
 
     return NextResponse.json(income);
   } catch (error) {

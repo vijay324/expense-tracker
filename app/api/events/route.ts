@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { addClient, removeClient } from "@/lib/event-service";
 
 // Store active connections
 const clients = new Set<{
@@ -42,8 +43,7 @@ export async function GET(req: NextRequest) {
   const stream = new ReadableStream({
     start(controller) {
       // Store the client connection
-      const client = { userId, controller };
-      clients.add(client);
+      const client = addClient(userId, controller);
 
       // Send initial connection message
       controller.enqueue(
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 
       // Remove the client when the connection is closed
       req.signal.addEventListener("abort", () => {
-        clients.delete(client);
+        removeClient(client);
         clearInterval(keepAliveInterval);
       });
     },

@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import type { Handler } from "typed-route-handler";
-import { broadcastEvent } from "../../events/route";
+import { broadcastEvent } from "@/lib/event-service";
 
 interface Income {
   id: string;
@@ -150,6 +150,9 @@ export const PATCH: Handler<Income> = async (req, { params }) => {
       },
     });
 
+    // Broadcast the event to all connected clients
+    broadcastEvent("INCOME_UPDATED", income);
+
     return NextResponse.json(income);
   } catch (error) {
     console.error("Error updating income:", error);
@@ -205,6 +208,9 @@ export const DELETE: Handler = async (req, { params }) => {
         userId: user.id,
       },
     });
+
+    // Broadcast the event to all connected clients
+    broadcastEvent("INCOME_DELETED", { id });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
