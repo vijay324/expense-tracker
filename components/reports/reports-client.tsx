@@ -788,31 +788,32 @@ function ReportsClientContent({
                   <Skeleton className="h-[300px] w-full" />
                 </div>
               ) : (
-                <div className="w-full h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={incomeByCategory}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={true}
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                        outerRadius={150}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {incomeByCategory.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => [`₹${value}`, ""]} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <div className="w-full h-[400px] overflow-x-auto">
+                  <div className="min-w-[800px] h-full px-2">
+                    <ResponsiveContainer width="100%" height={400}>
+                      <PieChart>
+                        <Pie
+                          data={incomeByCategory}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius="70%"
+                          labelLine={true}
+                          label={({ name, percent }) =>
+                            `${name} (${(percent * 100).toFixed(1)}%)`
+                          }
+                          dataKey="value"
+                        >
+                          {incomeByCategory.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => [`₹${value}`, ""]} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -883,31 +884,32 @@ function ReportsClientContent({
                   <Skeleton className="h-[300px] w-full" />
                 </div>
               ) : (
-                <div className="w-full h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={expensesByCategory}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={true}
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                        outerRadius={150}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {expensesByCategory.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => [`₹${value}`, ""]} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <div className="w-full h-[400px] overflow-x-auto">
+                  <div className="min-w-[800px] h-full">
+                    <ResponsiveContainer width="100%" height={400}>
+                      <PieChart>
+                        <Pie
+                          data={expensesByCategory}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius="70%"
+                          labelLine={true}
+                          label={({ name, percent }) =>
+                            `${name} (${(percent * 100).toFixed(1)}%)`
+                          }
+                          dataKey="value"
+                        >
+                          {incomeByCategory.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => [`₹${value}`, ""]} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               )}
             </CardContent>

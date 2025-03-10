@@ -130,7 +130,7 @@ export function DataTable<T extends { id: string }>({
                   ))}
                   {(onEdit || onDelete) && (
                     <TableCell className="whitespace-nowrap">
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex gap-2">
                         {onEdit && (
                           <Button
                             variant="outline"
