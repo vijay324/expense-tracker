@@ -71,7 +71,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         >
           <Navbar toggleSidebar={toggleSidebar} isMobile={isMobile} />
           <main className="flex-1 pt-16 md:px-4 lg:px-8 pb-8">
-            <div className="max-w-7xl mx-auto">{children}</div>
+            <div className="max-w-7xl">{children}</div>
           </main>
         </div>
       </div>

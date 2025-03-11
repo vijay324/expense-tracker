@@ -1,28 +1,30 @@
-export const dynamic = "force-dynamic";
+"use client";
+
+import { useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 export default function Page() {
+  const { userId, isLoaded } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded) {
+      if (userId) {
+        // If user is authenticated, redirect to dashboard
+        redirect("/dashboard");
+      } else {
+        // If user is not authenticated, redirect to sign-in
+        redirect("/sign-in");
+      }
+    }
+  }, [isLoaded, userId]);
+
+  // Show loading state while auth is being loaded
   return (
-    <div className="flex-1 p-4 md:p-6 lg:p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Welcome to Expense Tracker
-        </h2>
-      </div>
-      <p className="mb-4">
-        Please use the sidebar to navigate to different sections of the
-        application.
-      </p>
-      <p className="mb-4">
-        You can view your dashboard, manage income and expenses, or generate
-        reports.
-      </p>
-      <div className="mt-8">
-        <a
-          href="/dashboard"
-          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-        >
-          Go to Dashboard
-        </a>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">Expense Tracker</h1>
+        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
     </div>
   );

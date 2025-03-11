@@ -31,8 +31,14 @@ const formSchema = z.object({
   amount: z
     .string()
     .min(1, { message: "Amount is required." })
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Amount must be a positive number.",
+    .refine((val) => !isNaN(parseFloat(val)), {
+      message: "Amount must be a valid number.",
+    })
+    .refine((val) => parseFloat(val) > 0, {
+      message: "Amount must be greater than zero.",
+    })
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val), {
+      message: "Amount can have at most 2 decimal places.",
     }),
   category: z.string().min(1, {
     message: "Please select a category.",
@@ -40,13 +46,24 @@ const formSchema = z.object({
   description: z
     .string()
     .max(100, { message: "Description cannot exceed 100 characters." })
-    .optional(),
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
   date: z
     .string()
     .min(1, { message: "Date is required." })
     .refine((val) => !isNaN(Date.parse(val)), {
       message: "Please enter a valid date.",
-    }),
+    })
+    .refine(
+      (val) => {
+        const date = new Date(val);
+        const now = new Date();
+        return date <= now;
+      },
+      {
+        message: "Date cannot be in the future.",
+      }
+    ),
 });
 
 interface ExpenseFormProps {
@@ -95,6 +112,23 @@ export function ExpenseForm({
     setIsLoading(true);
 
     try {
+      // Validate amount as a number before sending
+      const numericAmount = parseFloat(values.amount);
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        form.setError("amount", {
+          type: "manual",
+          message: "Please enter a valid positive amount.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Format the values before sending
+      const formattedValues = {
+        ...values,
+        amount: numericAmount.toFixed(2),
+      };
+
       const endpoint = isEditing
         ? `/api/expenses/${initialData.id}`
         : "/api/expenses";
@@ -105,11 +139,13 @@ export function ExpenseForm({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(formattedValues),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save expense");
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || "Failed to save expense";
+        throw new Error(errorMessage);
       }
 
       toast.success(`Expense ${isEditing ? "updated" : "added"} successfully!`);
@@ -122,7 +158,11 @@ export function ExpenseForm({
       }
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
