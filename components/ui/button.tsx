@@ -10,9 +10,11 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         income:
-          "bg-income/50 dark:bg-income/30 font-semibold text-green-900 dark:text-green-300 hover:text-white hover:bg-income/90",
+          "bg-green-500/10 dark:bg-green-500/10 text-green-800 dark:text-green-300 font-medium px-4 py-2 rounded-lg shadow-sm border border-green-500  transition-all hover:bg-green-500 hover:text-white hover:shadow-md hover:border-green-600",
+
         expense:
-          "bg-expense/70 dark:bg-expense/30 font-semibold text-red-900 dark:text-red-300 hover:text-white hover:bg-expense/90",
+          "bg-red-500/10 dark:bg-red-500/10 text-red-800 dark:text-red-300  font-medium px-4 py-2 rounded-lg shadow-sm border border-red-500  transition-all hover:bg-red-500 hover:text-white hover:shadow-md hover:border-red-600",
+
         destructive: "bg-destructive text-white hover:bg-destructive/90",
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",

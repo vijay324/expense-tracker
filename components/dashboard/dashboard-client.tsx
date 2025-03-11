@@ -147,7 +147,7 @@ export function DashboardClient() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Total Income Card */}
-        <Card className="overflow-hidden border-l-4 border-l-emerald-500">
+        <Card className="overflow-hidden border-2 border-l-5 border-emerald-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
             <CardTitle className="text-sm font-medium">Total Income</CardTitle>
             <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -167,7 +167,7 @@ export function DashboardClient() {
         </Card>
 
         {/* Total Expenses Card */}
-        <Card className="overflow-hidden border-l-4 border-l-rose-500">
+        <Card className="overflow-hidden border-2 border-l-5 border-rose-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
             <CardTitle className="text-sm font-medium">
               Total Expenses
@@ -189,7 +189,7 @@ export function DashboardClient() {
         </Card>
 
         {/* Net Savings Card */}
-        <Card className="overflow-hidden border-l-4 border-l-purple-500">
+        <Card className="overflow-hidden border-2 border-l-5 border-purple-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
             <CardTitle className="text-sm font-medium">Net Savings</CardTitle>
             <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
