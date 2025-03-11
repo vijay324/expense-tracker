@@ -59,7 +59,7 @@ export default async function IncomePage() {
           Income
         </h2>
         <IncomeDialog
-          buttonVariant="default"
+          buttonVariant="income"
           buttonSize="default"
           showIcon={true}
           className="ml-4"

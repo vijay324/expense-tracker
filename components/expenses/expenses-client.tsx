@@ -32,7 +32,7 @@ export function ExpensesClient({ initialExpenses }: ExpensesClientProps) {
           Expenses
         </h2>
         <ExpenseDialog
-          buttonVariant="default"
+          buttonVariant="expense"
           buttonSize="default"
           showIcon={true}
           className="ml-4"
