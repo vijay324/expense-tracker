@@ -3,12 +3,10 @@
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,63 +24,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
-
-const formSchema = z.object({
-  amount: z
-    .string()
-    .min(1, { message: "Amount is required." })
-    .refine((val) => !isNaN(parseFloat(val)), {
-      message: "Amount must be a valid number.",
-    })
-    .refine((val) => parseFloat(val) > 0, {
-      message: "Amount must be greater than zero.",
-    })
-    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val), {
-      message: "Amount can have at most 2 decimal places.",
-    }),
-  category: z.string().min(1, {
-    message: "Please select a category.",
-  }),
-  description: z
-    .string()
-    .max(100, { message: "Description cannot exceed 100 characters." })
-    .optional()
-    .transform((val) => (val === "" ? undefined : val)),
-  date: z
-    .string()
-    .min(1, { message: "Date is required." })
-    .refine((val) => !isNaN(Date.parse(val)), {
-      message: "Please enter a valid date.",
-    })
-    .refine(
-      (val) => {
-        const date = new Date(val);
-        const now = new Date();
-        return date <= now;
-      },
-      {
-        message: "Date cannot be in the future.",
-      }
-    ),
-});
-
-interface ExpenseFormProps {
-  initialData?: {
-    id: string;
-    amount: string;
-    category: string;
-    description: string;
-    date: string;
-  };
-  onSuccess?: () => void;
-  onCancel?: () => void;
-}
+import {
+  transactionFormSchema,
+  TransactionFormProps,
+  TransactionFormSchema,
+  validateAndFormatAmount,
+} from "@/lib/form-schemas";
 
 export function ExpenseForm({
   initialData,
   onSuccess,
   onCancel,
-}: ExpenseFormProps = {}) {
+}: TransactionFormProps = {}) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
@@ -91,8 +44,8 @@ export function ExpenseForm({
 
   const isEditing = !!initialData?.id;
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<TransactionFormSchema>({
+    resolver: zodResolver(transactionFormSchema),
     defaultValues: {
       amount: initialData?.amount || "",
       category: initialData?.category || "",
@@ -108,17 +61,16 @@ export function ExpenseForm({
     }
   }, [selectedDate, form]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: TransactionFormSchema) {
     setIsLoading(true);
 
     try {
       // Validate amount as a number before sending
-      const numericAmount = parseFloat(values.amount);
-      if (isNaN(numericAmount) || numericAmount <= 0) {
-        form.setError("amount", {
-          type: "manual",
-          message: "Please enter a valid positive amount.",
-        });
+      const formattedAmount = validateAndFormatAmount(
+        values.amount,
+        form.setError
+      );
+      if (!formattedAmount) {
         setIsLoading(false);
         return;
       }
@@ -126,7 +78,7 @@ export function ExpenseForm({
       // Format the values before sending
       const formattedValues = {
         ...values,
-        amount: numericAmount.toFixed(2),
+        amount: formattedAmount,
       };
 
       const endpoint = isEditing
@@ -297,7 +249,9 @@ export function ExpenseForm({
           )}
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? "Saving..."
+              ? isEditing
+                ? "Updating..."
+                : "Adding..."
               : isEditing
               ? "Update Expense"
               : "Add Expense"}
